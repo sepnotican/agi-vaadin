@@ -1,5 +1,6 @@
 package com.sepnotican.springjpaformautocreator.generator.form;
 
+import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.converter.StringToLongConverter;
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 public class AbstractForm<T> extends VerticalLayout {
 
     private static final String BTN_SAVE_TEXT = "Save";
+    private static final String EMPTY_ENUM_TEXT = "<empty>";
     private T entity;
 
     @Autowired
@@ -72,7 +74,13 @@ public class AbstractForm<T> extends VerticalLayout {
 
         Class clazzEnum = field.getType();
         ComboBox comboBox = new ComboBox<>();
-        comboBox.setEmptySelectionCaption(clazzEnum.getName());
+
+        if (field.isAnnotationPresent(Synonym.class)) {
+            comboBox.setCaption(field.getAnnotation(Synonym.class).value());
+        } else comboBox.setCaption(field.getName());
+
+        comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
+
         comboBox.setItems(field.getType().getEnumConstants());
 
         binder.bind(comboBox, field.getName());

@@ -2,6 +2,7 @@ package com.sepnotican.springjpaformautocreator;
 
 import com.sepnotican.springjpaformautocreator.entity.Customer;
 import com.sepnotican.springjpaformautocreator.generator.form.AbstractForm;
+import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Label;
@@ -18,12 +19,15 @@ public class MainUI extends UI {
     @Autowired
     private AbstractForm<Customer> abstractForm;
 
+    @Autowired
+    private CustomerRepo customerRepo;
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
         mainLayout = new VerticalLayout();
         mainLayout.addComponent(new Label("Hello ! 123"));
-        Customer customer = new Customer(1L, "Vaski", EnumColor.GREEN);
+        Customer customer = customerRepo.findById(1L).get();
 
         abstractForm.init(customer);
 
