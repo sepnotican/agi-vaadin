@@ -11,9 +11,11 @@ import javax.persistence.Id;
 public class Customer {
 
     @Id
+    @Synonym("Identifier")
     private Long id;
 
     @Column
+    @Synonym("Customer name")
     private String name;
 
     @Column

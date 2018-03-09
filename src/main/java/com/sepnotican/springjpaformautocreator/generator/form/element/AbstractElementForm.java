@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.springjpaformautocreator.generator.form.element;
 
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.vaadin.data.Binder;
@@ -13,16 +13,19 @@ import java.lang.reflect.Field;
 
 @org.springframework.stereotype.Component
 @Scope("stereotype")
-public class AbstractForm<T> extends VerticalLayout {
+public class AbstractElementForm<T> extends VerticalLayout {
 
     private static final String BTN_SAVE_TEXT = "Save";
     private static final String EMPTY_ENUM_TEXT = "<empty>";
+    private static final String BTN_RELOAD_TEXT = "Reload";
     private T entity;
+
+    private Layout defaultControlPanel;
 
     @Autowired
     private JpaRepository<T, Long> repository;
 
-    public AbstractForm() {
+    public AbstractElementForm() {
     }
 
     public void init(T entity) {
@@ -39,11 +42,18 @@ public class AbstractForm<T> extends VerticalLayout {
 
             if (component == null) continue;
 
+            makeUpCaptionForField(field, component);
             addComponent(component);
 
         }
         binder.bindInstanceFields(entity);
         binder.readBean(entity);
+
+        initDefaultControlPanel(binder);
+    }
+
+    protected void initDefaultControlPanel(Binder binder) {
+        defaultControlPanel = new HorizontalLayout();
 
         Button buttonSave = new Button(BTN_SAVE_TEXT, event -> {
             try {
@@ -53,8 +63,18 @@ public class AbstractForm<T> extends VerticalLayout {
                 e.printStackTrace();
             }
         });
+        Button buttonReload = new Button(BTN_RELOAD_TEXT, event -> {
+            binder.readBean(entity);
+        });
 
-        addComponent(buttonSave);
+        defaultControlPanel.addComponent(buttonSave);
+        defaultControlPanel.addComponent(buttonReload);
+    }
+
+    protected void makeUpCaptionForField(Field field, Component component) {
+        if (field.isAnnotationPresent(Synonym.class)) {
+            component.setCaption(field.getAnnotation(Synonym.class).value());
+        } else component.setCaption(field.getName());
     }
 
     protected Component getComponentByFieldAndBind(Field field, Binder binder) {
@@ -74,10 +94,6 @@ public class AbstractForm<T> extends VerticalLayout {
 
         Class clazzEnum = field.getType();
         ComboBox comboBox = new ComboBox<>();
-
-        if (field.isAnnotationPresent(Synonym.class)) {
-            comboBox.setCaption(field.getAnnotation(Synonym.class).value());
-        } else comboBox.setCaption(field.getName());
 
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
 

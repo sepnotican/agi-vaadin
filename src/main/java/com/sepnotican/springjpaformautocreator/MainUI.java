@@ -1,7 +1,7 @@
 package com.sepnotican.springjpaformautocreator;
 
 import com.sepnotican.springjpaformautocreator.entity.Customer;
-import com.sepnotican.springjpaformautocreator.generator.form.AbstractForm;
+import com.sepnotican.springjpaformautocreator.generator.form.element.AbstractElementForm;
 import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
@@ -17,7 +17,7 @@ public class MainUI extends UI {
     private Layout mainLayout;
 
     @Autowired
-    private AbstractForm<Customer> abstractForm;
+    private AbstractElementForm<Customer> abstractElementForm;
 
     @Autowired
     private CustomerRepo customerRepo;
@@ -29,9 +29,9 @@ public class MainUI extends UI {
         mainLayout.addComponent(new Label("Hello ! 123"));
         Customer customer = customerRepo.findById(1L).get();
 
-        abstractForm.init(customer);
+        abstractElementForm.init(customer);
 
-        mainLayout.addComponent(abstractForm);
+        mainLayout.addComponent(abstractElementForm);
         setContent(mainLayout);
 
         new Thread(() -> {
