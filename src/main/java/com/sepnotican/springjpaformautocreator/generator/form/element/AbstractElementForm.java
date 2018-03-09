@@ -4,6 +4,7 @@ import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.converter.StringToLongConverter;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,12 +16,13 @@ import java.lang.reflect.Field;
 @Scope("stereotype")
 public class AbstractElementForm<T> extends VerticalLayout {
 
-    private static final String BTN_SAVE_TEXT = "Save";
-    private static final String EMPTY_ENUM_TEXT = "<empty>";
-    private static final String BTN_RELOAD_TEXT = "Reload";
-    private T entity;
+    public static final String BTN_SAVE_TEXT = "Save";
+    public static final String EMPTY_ENUM_TEXT = "<empty>";
+    public static final String BTN_RELOAD_TEXT = "Reload";
 
-    private Layout defaultControlPanel;
+    protected T entity;
+    protected Binder binder;
+    protected Layout defaultControlPanel;
 
     @Autowired
     private JpaRepository<T, Long> repository;
@@ -29,12 +31,14 @@ public class AbstractElementForm<T> extends VerticalLayout {
     }
 
     public void init(T entity) {
-        this.entity = entity;
         components.clear();
+        this.entity = entity;
+        binder = new Binder(entity.getClass());
+
+        initDefaultControlPanel(binder);
 
         Class clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
-        Binder binder = new Binder(entity.getClass());
 
         for (Field field : fields) {
 
@@ -49,7 +53,6 @@ public class AbstractElementForm<T> extends VerticalLayout {
         binder.bindInstanceFields(entity);
         binder.readBean(entity);
 
-        initDefaultControlPanel(binder);
     }
 
     protected void initDefaultControlPanel(Binder binder) {
@@ -63,12 +66,17 @@ public class AbstractElementForm<T> extends VerticalLayout {
                 e.printStackTrace();
             }
         });
+        buttonSave.setIcon(VaadinIcons.CHECK);
+
         Button buttonReload = new Button(BTN_RELOAD_TEXT, event -> {
             binder.readBean(entity);
         });
+        buttonReload.setIcon(VaadinIcons.REFRESH);
+
 
         defaultControlPanel.addComponent(buttonSave);
         defaultControlPanel.addComponent(buttonReload);
+        addComponent(defaultControlPanel);
     }
 
     protected void makeUpCaptionForField(Field field, Component component) {
