@@ -1,6 +1,7 @@
 package com.sepnotican.springjpaformautocreator.entity;
 
 import com.sepnotican.springjpaformautocreator.EnumColor;
+import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 
 import javax.persistence.Column;
@@ -17,6 +18,10 @@ public class Customer {
     @Column
     @Synonym("Customer name")
     private String name;
+
+    @Column
+    @BigString
+    private String description;
 
     @Column
     @Synonym("Color")
