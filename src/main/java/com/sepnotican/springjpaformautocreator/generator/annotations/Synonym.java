@@ -1,10 +1,12 @@
 package com.sepnotican.springjpaformautocreator.generator.annotations;
 
+import com.sepnotican.springjpaformautocreator.generator.form.element.AbstractElementForm;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * annotation uses in {@link com.sepnotican.springjpaformautocreator.generator.form.AbstractForm}
+ * annotation uses in {@link AbstractElementForm}
  * when creating fields
  * to create user-friendly captions to the fields.
  */
