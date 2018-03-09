@@ -5,11 +5,13 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
 
 @org.springframework.stereotype.Component
+@Scope("stereotype")
 public class AbstractForm<T> extends VerticalLayout {
 
     private static final String BTN_SAVE_TEXT = "Save";
