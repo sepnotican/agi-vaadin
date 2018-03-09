@@ -23,6 +23,7 @@ public class AbstractForm<T> extends VerticalLayout {
 
     public void init(T entity) {
         this.entity = entity;
+        components.clear();
 
         Class clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
