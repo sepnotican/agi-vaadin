@@ -36,6 +36,15 @@ public class Customer {
         this.color = color;
     }
 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public EnumColor getColor() {
         return color;
     }

@@ -1,7 +1,9 @@
 package com.sepnotican.springjpaformautocreator.generator.form.element;
 
+import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.vaadin.data.Binder;
+import com.vaadin.data.HasValue;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.icons.VaadinIcons;
@@ -55,6 +57,19 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
     }
 
+    protected Component getComponentByFieldAndBind(Field field, Binder binder) {
+        if (field.getType().equals(Long.class)) {
+            return generateLongField(field, binder);
+
+        } else if (field.getType().equals(String.class)) {
+            return generateStringField(field, binder);
+
+        } else if (field.getType().isEnum()) {
+            return generateEnumField(field, binder);
+
+        } else return null;
+    }
+
     protected void initDefaultControlPanel(Binder binder) {
         defaultControlPanel = new HorizontalLayout();
 
@@ -85,19 +100,6 @@ public class AbstractElementForm<T> extends VerticalLayout {
         } else component.setCaption(field.getName());
     }
 
-    protected Component getComponentByFieldAndBind(Field field, Binder binder) {
-        if (field.getType().equals(Long.class)) {
-            return generateLongField(field, binder);
-
-        } else if (field.getType().equals(String.class)) {
-            return generateStringField(field, binder);
-
-        } else if (field.getType().isEnum()) {
-            return generateEnumField(field, binder);
-
-        } else return null;
-    }
-
     protected Component generateEnumField(Field field, Binder binder) {
 
         Class clazzEnum = field.getType();
@@ -113,9 +115,14 @@ public class AbstractElementForm<T> extends VerticalLayout {
     }
 
     protected Component generateStringField(Field field, Binder binder) {
-        TextField textField = new TextField(field.getName());
 
-        binder.bind(textField, field.getName());
+        Component textField = null;
+
+        if (field.isAnnotationPresent(BigString.class)) {
+            textField = new TextArea();
+        } else textField = new TextField();
+
+        binder.bind((HasValue) textField, field.getName());
 
         return textField;
     }

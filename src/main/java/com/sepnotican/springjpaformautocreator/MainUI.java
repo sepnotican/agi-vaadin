@@ -33,15 +33,6 @@ public class MainUI extends UI {
 
         mainLayout.addComponent(abstractElementForm);
         setContent(mainLayout);
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(7000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.err.println(customer);
-        }).start();
     }
 
 
