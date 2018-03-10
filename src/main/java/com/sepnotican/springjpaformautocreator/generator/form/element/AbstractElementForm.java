@@ -2,6 +2,7 @@ package com.sepnotican.springjpaformautocreator.generator.form.element;
 
 import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
+import com.sepnotican.springjpaformautocreator.generator.annotations.UIDrawOrder;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValidationException;
@@ -13,10 +14,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
 @Scope("stereotype")
-public class AbstractElementForm<T> extends VerticalLayout {
+public class AbstractElementForm<T> extends GridLayout {
 
     public static final String BTN_SAVE_TEXT = "Save";
     public static final String EMPTY_ENUM_TEXT = "<empty>";
@@ -33,29 +38,112 @@ public class AbstractElementForm<T> extends VerticalLayout {
     }
 
     public void init(T entity) {
-        components.clear();
+        removeAllComponents();
+
         this.entity = entity;
         binder = new Binder(entity.getClass());
 
         initDefaultControlPanel(binder);
 
         Class clazz = entity.getClass();
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fieldsArray = clazz.getDeclaredFields();
+        ArrayList<Field> fieldArrayList = createOrderedElementsList(fieldsArray);
 
-        for (Field field : fields) {
+        drawGridRowsColumnsByArray(fieldArrayList);
+
+        for (Field field : fieldArrayList) {
 
             Component component = getComponentByFieldAndBind(field, binder);
 
             if (component == null) continue;
 
+            component.setWidthUndefined();
+            component.setHeightUndefined();
+            component.setSizeFull();
+
             makeUpCaptionForField(field, component);
-            addComponent(component);
+
+            if (field.isAnnotationPresent(UIDrawOrder.class)) {
+                UIDrawOrder uiDrawOrder = field.getAnnotation(UIDrawOrder.class);
+                System.err.println("" + field.getName() + " " +
+                        uiDrawOrder.column() + " " +
+                        uiDrawOrder.row() + " " +
+                        uiDrawOrder.columnStretch() + " " +
+                        uiDrawOrder.rowStretch());
+                addComponent(component,
+                        uiDrawOrder.column(),
+                        uiDrawOrder.row(),
+                        uiDrawOrder.columnStretch(),
+                        uiDrawOrder.rowStretch());
+            } else addComponent(component);
 
         }
         binder.bindInstanceFields(entity);
         binder.readBean(entity);
 
     }
+
+    protected void drawGridRowsColumnsByArray(ArrayList<Field> fieldArrayList) {
+        int columns = 1, rows = 0;
+        for (Field field : fieldArrayList) {
+            if (field.isAnnotationPresent(UIDrawOrder.class)) {
+                UIDrawOrder uiDrawOrder = field.getAnnotation(UIDrawOrder.class);
+                columns = Math.max(uiDrawOrder.column() + uiDrawOrder.columnStretch(), columns);
+                rows = Math.max(uiDrawOrder.row() + uiDrawOrder.rowStretch(), rows);
+            }
+        }
+        rows += 1;
+        columns += 1;
+        setRows(rows == 0 ? fieldArrayList.size() : rows);
+        setColumns(columns);
+    }
+
+    protected ArrayList<Field> createOrderedElementsList(Field[] fieldsArray) {
+        return new ArrayList<>(Arrays.stream(fieldsArray)
+                .sorted(new UIOrderColumnRowComparator())
+                .collect(Collectors.toList()));
+    }
+
+    protected class UIOrderColumnRowComparator implements Comparator<Field> {
+
+        @Override
+        public int compare(Field o1, Field o2) {
+            if (!o1.isAnnotationPresent(UIDrawOrder.class)
+                    && o2.isAnnotationPresent(UIDrawOrder.class))
+                return 1;
+            else if (o1.isAnnotationPresent(UIDrawOrder.class)
+                    && !o2.isAnnotationPresent(UIDrawOrder.class))
+                return -1;
+            else if (!o1.isAnnotationPresent(UIDrawOrder.class)
+                    && !o2.isAnnotationPresent(UIDrawOrder.class))
+                return 0;
+            else if (o1.getAnnotation(UIDrawOrder.class).column() >
+                    o2.getAnnotation(UIDrawOrder.class).column())
+                return 1;
+            else if ((o1.getAnnotation(UIDrawOrder.class).column() <
+                    o2.getAnnotation(UIDrawOrder.class).column()))
+                return -1;
+
+            return compareByRow(o1, o2);
+        }
+
+        private int compareByRow(Field o1, Field o2) {
+            if (!o1.isAnnotationPresent(UIDrawOrder.class))
+                return -1;
+            if (o1.isAnnotationPresent(UIDrawOrder.class)
+                    && o2.isAnnotationPresent(UIDrawOrder.class)) {
+                if (o1.getAnnotation(UIDrawOrder.class).row() >
+                        o2.getAnnotation(UIDrawOrder.class).row())
+                    return 1;
+                else if ((o1.getAnnotation(UIDrawOrder.class).row() <
+                        o2.getAnnotation(UIDrawOrder.class).row()))
+                    return -1;
+                else return 0;
+            }
+            return 0;
+        }
+    }
+
 
     protected Component getComponentByFieldAndBind(Field field, Binder binder) {
         if (field.getType().equals(Long.class)) {
