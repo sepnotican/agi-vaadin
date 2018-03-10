@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator.generator.form.element;
+package com.sepnotican.springjpaformautocreator.generator.form;
 
 import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
@@ -9,7 +9,6 @@ import com.vaadin.data.ValidationException;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -31,10 +30,10 @@ public class AbstractElementForm<T> extends VerticalLayout {
     protected Binder binder;
     protected Layout defaultControlPanel;
 
-    @Autowired
     private JpaRepository<T, Long> repository;
 
-    public AbstractElementForm() {
+    public AbstractElementForm(JpaRepository<T, Long> repository) {
+        this.repository = repository;
     }
 
     public void init(T entity) {
