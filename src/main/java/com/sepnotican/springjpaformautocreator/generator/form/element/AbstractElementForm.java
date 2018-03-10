@@ -112,7 +112,10 @@ public class AbstractElementForm<T> extends VerticalLayout {
     protected void initDefaultControlPanel(Binder binder) {
         defaultControlPanel = new HorizontalLayout();
 
-        Button buttonSave = new Button(BTN_SAVE_TEXT, event -> {
+        MenuBar menuBar = new MenuBar();
+        MenuBar.MenuItem menuItemSave = menuBar.addItem(BTN_SAVE_TEXT,
+                VaadinIcons.CHECK,
+                event -> {
             try {
                 binder.writeBean(entity);
                 repository.save(entity);
@@ -120,16 +123,13 @@ public class AbstractElementForm<T> extends VerticalLayout {
                 e.printStackTrace();
             }
         });
-        buttonSave.setIcon(VaadinIcons.CHECK);
 
-        Button buttonReload = new Button(BTN_RELOAD_TEXT, event -> {
-            binder.readBean(entity);
-        });
-        buttonReload.setIcon(VaadinIcons.REFRESH);
+        MenuBar.MenuItem menuItemReload = menuBar.addItem(BTN_RELOAD_TEXT,
+                VaadinIcons.REFRESH,
+                event -> binder.readBean(entity));
 
 
-        defaultControlPanel.addComponent(buttonSave);
-        defaultControlPanel.addComponent(buttonReload);
+        defaultControlPanel.addComponent(menuBar);
         addComponent(defaultControlPanel);
     }
 
