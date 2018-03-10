@@ -14,22 +14,22 @@ public class Customer {
 
     @Id
     @Synonym("Identifier")
-    @UIDrawOrder(row = 1, rowStretch = 1, column = 0, columnStretch = 2)
+    @UIDrawOrder(drawOrder = -1)
     private Long id;
 
     @Column
     @Synonym("Customer name")
-    @UIDrawOrder(row = 5, rowStretch = 5, column = 0, columnStretch = 0)
+    @UIDrawOrder(drawOrder = 2)
     private String name;
 
     @Column
     @BigString
-    @UIDrawOrder(row = 2, rowStretch = 4, column = 0, columnStretch = 1)
+    @Synonym("Customer description")
     private String description;
 
     @Column
     @Synonym("Color")
-    @UIDrawOrder(row = 5, rowStretch = 5, column = 1, columnStretch = 1)
+    @UIDrawOrder(drawOrder = 5)
     private EnumColor color;
 
     public Customer() {

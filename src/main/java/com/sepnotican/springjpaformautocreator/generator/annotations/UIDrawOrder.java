@@ -12,12 +12,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UIDrawOrder {
-    int row();
-
-    int rowStretch();
-
-    int column();
-
-    int columnStretch();
+    int drawOrder() default 0;
 
 }

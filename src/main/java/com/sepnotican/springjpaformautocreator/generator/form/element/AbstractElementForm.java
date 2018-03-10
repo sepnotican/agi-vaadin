@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
 @Scope("stereotype")
-public class AbstractElementForm<T> extends GridLayout {
+public class AbstractElementForm<T> extends VerticalLayout {
 
     public static final String BTN_SAVE_TEXT = "Save";
     public static final String EMPTY_ENUM_TEXT = "<empty>";
@@ -49,33 +49,15 @@ public class AbstractElementForm<T> extends GridLayout {
         Field[] fieldsArray = clazz.getDeclaredFields();
         ArrayList<Field> fieldArrayList = createOrderedElementsList(fieldsArray);
 
-        drawGridRowsColumnsByArray(fieldArrayList);
-
         for (Field field : fieldArrayList) {
 
             Component component = getComponentByFieldAndBind(field, binder);
 
             if (component == null) continue;
 
-            component.setWidthUndefined();
-            component.setHeightUndefined();
-            component.setSizeFull();
-
             makeUpCaptionForField(field, component);
 
-            if (field.isAnnotationPresent(UIDrawOrder.class)) {
-                UIDrawOrder uiDrawOrder = field.getAnnotation(UIDrawOrder.class);
-                System.err.println("" + field.getName() + " " +
-                        uiDrawOrder.column() + " " +
-                        uiDrawOrder.row() + " " +
-                        uiDrawOrder.columnStretch() + " " +
-                        uiDrawOrder.rowStretch());
-                addComponent(component,
-                        uiDrawOrder.column(),
-                        uiDrawOrder.row(),
-                        uiDrawOrder.columnStretch(),
-                        uiDrawOrder.rowStretch());
-            } else addComponent(component);
+            addComponent(component);
 
         }
         binder.bindInstanceFields(entity);
@@ -83,28 +65,13 @@ public class AbstractElementForm<T> extends GridLayout {
 
     }
 
-    protected void drawGridRowsColumnsByArray(ArrayList<Field> fieldArrayList) {
-        int columns = 1, rows = 0;
-        for (Field field : fieldArrayList) {
-            if (field.isAnnotationPresent(UIDrawOrder.class)) {
-                UIDrawOrder uiDrawOrder = field.getAnnotation(UIDrawOrder.class);
-                columns = Math.max(uiDrawOrder.column() + uiDrawOrder.columnStretch(), columns);
-                rows = Math.max(uiDrawOrder.row() + uiDrawOrder.rowStretch(), rows);
-            }
-        }
-        rows += 1;
-        columns += 1;
-        setRows(rows == 0 ? fieldArrayList.size() : rows);
-        setColumns(columns);
-    }
-
     protected ArrayList<Field> createOrderedElementsList(Field[] fieldsArray) {
         return new ArrayList<>(Arrays.stream(fieldsArray)
-                .sorted(new UIOrderColumnRowComparator())
+                .sorted(new UIOrderComparator())
                 .collect(Collectors.toList()));
     }
 
-    protected class UIOrderColumnRowComparator implements Comparator<Field> {
+    protected class UIOrderComparator implements Comparator<Field> {
 
         @Override
         public int compare(Field o1, Field o2) {
@@ -117,29 +84,13 @@ public class AbstractElementForm<T> extends GridLayout {
             else if (!o1.isAnnotationPresent(UIDrawOrder.class)
                     && !o2.isAnnotationPresent(UIDrawOrder.class))
                 return 0;
-            else if (o1.getAnnotation(UIDrawOrder.class).column() >
-                    o2.getAnnotation(UIDrawOrder.class).column())
+            else if (o1.getAnnotation(UIDrawOrder.class).drawOrder() >
+                    o2.getAnnotation(UIDrawOrder.class).drawOrder())
                 return 1;
-            else if ((o1.getAnnotation(UIDrawOrder.class).column() <
-                    o2.getAnnotation(UIDrawOrder.class).column()))
+            else if ((o1.getAnnotation(UIDrawOrder.class).drawOrder() <
+                    o2.getAnnotation(UIDrawOrder.class).drawOrder()))
                 return -1;
 
-            return compareByRow(o1, o2);
-        }
-
-        private int compareByRow(Field o1, Field o2) {
-            if (!o1.isAnnotationPresent(UIDrawOrder.class))
-                return -1;
-            if (o1.isAnnotationPresent(UIDrawOrder.class)
-                    && o2.isAnnotationPresent(UIDrawOrder.class)) {
-                if (o1.getAnnotation(UIDrawOrder.class).row() >
-                        o2.getAnnotation(UIDrawOrder.class).row())
-                    return 1;
-                else if ((o1.getAnnotation(UIDrawOrder.class).row() <
-                        o2.getAnnotation(UIDrawOrder.class).row()))
-                    return -1;
-                else return 0;
-            }
             return 0;
         }
     }
