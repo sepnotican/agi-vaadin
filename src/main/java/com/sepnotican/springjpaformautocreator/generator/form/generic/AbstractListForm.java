@@ -1,6 +1,7 @@
 package com.sepnotican.springjpaformautocreator.generator.form.generic;
 
 import com.sepnotican.springjpaformautocreator.PageableDataProvider;
+import com.sepnotican.springjpaformautocreator.generator.form.IFormHandler;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
@@ -15,14 +16,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
 
-    private static final String OPEN_TEXT = "Open element";
+    private static final String OPEN_TEXT = "Open";
+    private static final String DELETE_TEXT = "Delete";
+    private static final String CREATE_TEXT = "Create";
+    private IFormHandler formHandler;
+    private Class aClass;
+    private R repository;
+    private Grid<T> grid;
 
-    public AbstractListForm(Class aClass, R repository) {
+    public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
+        this.formHandler = formHandler;
+        this.repository = repository;
+        this.aClass = aClass;
 
-        Grid<T> grid = new Grid<T>(aClass);
+        grid = new Grid<T>(aClass);
+
+        grid.setHeightUndefined();
+        grid.setWidthUndefined();
+        grid.setSizeFull();
+
 
         grid.setDataProvider(new PageableDataProvider<T, String>() {
             @Override
@@ -57,10 +73,21 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createCommandPanel() {
         MenuBar commandPanel = new MenuBar();
-        commandPanel.addItem(OPEN_TEXT, VaadinIcons.FOLDER_OPEN,
+        MenuBar.MenuItem menuItemOpen = commandPanel.addItem(OPEN_TEXT, VaadinIcons.FOLDER_OPEN,
+                event -> {
+                    if (grid.getSelectedItems().isEmpty()) return;
+                    Set<T> selectedItems = grid.getSelectedItems();
+                    selectedItems.forEach(item -> formHandler.showAbstractElementForm(aClass, repository, item));
+                });
+        MenuBar.MenuItem menuItemCreate = commandPanel.addItem(CREATE_TEXT, VaadinIcons.FOLDER_OPEN,
                 event -> {
                     //todo
                 });
+        MenuBar.MenuItem menuItemDelete = commandPanel.addItem(DELETE_TEXT, VaadinIcons.FOLDER_OPEN,
+                event -> {
+                    //todo
+                });
+        addComponent(commandPanel);
     }
 
 }

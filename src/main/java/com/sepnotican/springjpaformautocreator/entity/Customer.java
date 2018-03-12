@@ -12,7 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@GenerateUI(caption = "Our Customers ", repo = CustomerRepo.class)
+@GenerateUI(listCaption = "Our Customers ",
+        entityCaption = "Customer",
+        repo = CustomerRepo.class)
 public class Customer {
 
     @Id

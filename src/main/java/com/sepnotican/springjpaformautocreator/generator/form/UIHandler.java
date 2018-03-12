@@ -53,7 +53,6 @@ public class UIHandler {
             context.getBean(CustomerRepo.class).saveAll(l1);
             context.getBean(TradeDealsRepo.class).saveAll(dealSet1);
             context.getBean(TradeDealsRepo.class).saveAll(dealSet2);
-//            context.getBean(CustomerRepo.class).saveAll(l1);
 
 
         });

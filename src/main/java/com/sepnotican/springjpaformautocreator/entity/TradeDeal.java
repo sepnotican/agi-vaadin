@@ -8,7 +8,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "trade_deals")
-@GenerateUI(caption = "Trade deals", repo = TradeDealsRepo.class)
+@GenerateUI(listCaption = "Trade deals",
+        entityCaption = "Trade deal",
+        repo = TradeDealsRepo.class)
 public class TradeDeal {
 
     @Column

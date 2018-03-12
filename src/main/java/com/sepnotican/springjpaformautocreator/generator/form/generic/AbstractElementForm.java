@@ -6,10 +6,11 @@ import com.sepnotican.springjpaformautocreator.generator.annotations.UIDrawOrder
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValidationException;
+import com.vaadin.data.converter.StringToDoubleConverter;
+import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.*;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
@@ -18,21 +19,19 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Component
-@Scope("stereotype")
-public class AbstractElementForm<T> extends VerticalLayout {
+public class AbstractElementForm<T> extends GridLayout {
 
     public static final String BTN_SAVE_TEXT = "Save";
-    public static final String EMPTY_ENUM_TEXT = "<empty>";
     public static final String BTN_RELOAD_TEXT = "Reload";
+    public static final String EMPTY_ENUM_TEXT = "<empty>";
 
     protected T entity;
-    protected Binder binder;
+    protected Binder<T> binder;
     protected Layout defaultControlPanel;
 
-    private JpaRepository<T, Long> repository;
+    private JpaRepository<T, Object> repository;
 
-    public AbstractElementForm(JpaRepository<T, Long> repository) {
+    public AbstractElementForm(JpaRepository<T, Object> repository) {
         this.repository = repository;
     }
 
@@ -53,6 +52,9 @@ public class AbstractElementForm<T> extends VerticalLayout {
             Component component = getComponentByFieldAndBind(field, binder);
 
             if (component == null) continue;
+
+            if (field.isAnnotationPresent(javax.persistence.Id.class))
+                ((HasValue) component).setReadOnly(true);
 
             makeUpCaptionForField(field, component);
 
@@ -95,19 +97,6 @@ public class AbstractElementForm<T> extends VerticalLayout {
     }
 
 
-    protected Component getComponentByFieldAndBind(Field field, Binder binder) {
-        if (field.getType().equals(Long.class)) {
-            return generateLongField(field, binder);
-
-        } else if (field.getType().equals(String.class)) {
-            return generateStringField(field, binder);
-
-        } else if (field.getType().isEnum()) {
-            return generateEnumField(field, binder);
-
-        } else return null;
-    }
-
     protected void initDefaultControlPanel(Binder binder) {
         defaultControlPanel = new HorizontalLayout();
 
@@ -138,43 +127,68 @@ public class AbstractElementForm<T> extends VerticalLayout {
         } else component.setCaption(field.getName());
     }
 
-    protected Component generateEnumField(Field field, Binder binder) {
+    protected Component getComponentByFieldAndBind(Field field, Binder binder) {
+        if (field.getType().equals(Long.class)
+                || field.getType().equals(long.class)) {
+            return generateLongField(field, binder);
 
+        } else if (field.getType().equals(Double.class)
+                || field.getType().equals(double.class)) {
+            return generateDoubleFieild(field, binder);
+
+        } else if (field.getType().equals(Float.class)
+                || field.getType().equals(float.class)) {
+            return generateFloatFieild(field, binder);
+
+        } else if (field.getType().equals(String.class)) {
+            return generateStringField(field, binder);
+
+        } else if (field.getType().isEnum()) {
+            return generateEnumField(field, binder);
+
+        } else return null;
+    }
+
+    protected Component generateFloatFieild(Field field, Binder binder) {
+        TextField textField = new TextField(field.getName());
+        binder.forField(textField)
+                .withConverter(new StringToFloatConverter("Must be a float value"))
+                .bind(field.getName());
+        return textField;
+    }
+
+    protected Component generateDoubleFieild(Field field, Binder binder) {
+        TextField textField = new TextField(field.getName());
+        binder.forField(textField)
+                .withConverter(new StringToDoubleConverter("Must be a double value"))
+                .bind(field.getName());
+        return textField;
+    }
+
+    protected Component generateEnumField(Field field, Binder binder) {
         Class clazzEnum = field.getType();
         ComboBox comboBox = new ComboBox<>();
-
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-
         comboBox.setItems(field.getType().getEnumConstants());
-
         binder.bind(comboBox, field.getName());
-
         return comboBox;
     }
 
     protected Component generateStringField(Field field, Binder binder) {
 
         Component textField = null;
-
         if (field.isAnnotationPresent(BigString.class)) {
             textField = new TextArea();
         } else textField = new TextField();
-
         binder.bind((HasValue) textField, field.getName());
-
         return textField;
     }
 
     protected Component generateLongField(Field field, Binder binder) {
         TextField textField = new TextField(field.getName());
-
         binder.forField(textField)
                 .withConverter(new StringToLongConverter("Must be a Long value"))
                 .bind(field.getName());
-
-        if (field.isAnnotationPresent(javax.persistence.Id.class))
-            textField.setReadOnly(true);
-
         return textField;
     }
 

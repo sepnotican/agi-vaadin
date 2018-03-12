@@ -35,7 +35,7 @@ public class MainMenuGenerator {
                 Class repositoryClass = generateUI.repo();
                 JpaRepository repository = (JpaRepository) context.getBean(repositoryClass);
 
-                MenuBar.MenuItem item = menuBar.addItem(generateUI.caption(), generateUI.icon(),
+                MenuBar.MenuItem item = menuBar.addItem(generateUI.listCaption(), generateUI.icon(),
                         event -> listFormHandler.showAbstractListForm(aClass, repository));
             }
 

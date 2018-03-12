@@ -11,7 +11,9 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateUI {
-    String caption();
+    String listCaption();
+
+    String entityCaption();
 
     VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
 
