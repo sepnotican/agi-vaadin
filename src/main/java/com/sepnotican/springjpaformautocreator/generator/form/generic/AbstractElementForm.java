@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.springjpaformautocreator.generator.form.generic;
 
 import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;

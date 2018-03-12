@@ -5,33 +5,43 @@ import com.sepnotican.springjpaformautocreator.generator.annotations.GenerateUI;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Set;
 
 public class MainMenuGenerator {
 
-    public void generateMenu(Layout layout, String[] packagesToScan) {
+    private MenuBar menuBar = new MenuBar();
+    private Layout layoutForMenu;
+    private IFormHandler listFormHandler;
+    private UIHandler uiHandler;
+
+    public MainMenuGenerator(UIHandler uiHandler, Layout layoutForMenu, IFormHandler listFormHandler) {
+        this.layoutForMenu = layoutForMenu;
+        this.uiHandler = uiHandler;
+        this.listFormHandler = listFormHandler;
+    }
+
+    public void init(String[] packagesToScan, ApplicationContext context) {
 
         for (String prefix : packagesToScan) {
-
-            MenuBar menuBar = new MenuBar();
 
             Reflections reflections = new Reflections(prefix);
             Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(GenerateUI.class);
 
             for (Class<?> aClass : annotated) {
                 GenerateUI generateUI = aClass.getAnnotation(GenerateUI.class);
-                MenuBar.MenuItem item = menuBar.addItem(generateUI.name(), generateUI.icon(),
-                        event -> createAbstractListForm(aClass));
+                Class repositoryClass = generateUI.repo();
+                JpaRepository repository = (JpaRepository) context.getBean(repositoryClass);
+
+                MenuBar.MenuItem item = menuBar.addItem(generateUI.caption(), generateUI.icon(),
+                        event -> listFormHandler.showAbstractListForm(aClass, repository));
             }
 
         }
 
-
-    }
-
-    private void createAbstractListForm(Class<?> aClass) {
-
+        layoutForMenu.addComponent(menuBar);
     }
 
 }

@@ -2,23 +2,27 @@ package com.sepnotican.springjpaformautocreator.entity;
 
 import com.sepnotican.springjpaformautocreator.EnumColor;
 import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
+import com.sepnotican.springjpaformautocreator.generator.annotations.GenerateUI;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.sepnotican.springjpaformautocreator.generator.annotations.UIDrawOrder;
+import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
+@Table(name = "customer")
+@GenerateUI(caption = "Our Customers ", repo = CustomerRepo.class)
 public class Customer {
 
     @Id
+    @GeneratedValue
     @Synonym("Identifier")
     @UIDrawOrder(drawOrder = -1)
     private Long id;
 
     @Column
-    @Synonym("Customer name")
+    @Synonym("Customer caption")
     @UIDrawOrder(drawOrder = 2)
     private String name;
 
@@ -32,7 +36,25 @@ public class Customer {
     @UIDrawOrder(drawOrder = 5)
     private EnumColor color;
 
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    private Set<TradeDeal> tradeDeals;
+
     public Customer() {
+    }
+
+    public Customer(String name, String description, EnumColor color, Set<TradeDeal> tradeDeals) {
+        this.name = name;
+        this.description = description;
+        this.color = color;
+        this.tradeDeals = tradeDeals;
+    }
+
+    public Set<TradeDeal> getTradeDeals() {
+        return tradeDeals;
+    }
+
+    public void setTradeDeals(Set<TradeDeal> tradeDeals) {
+        this.tradeDeals = tradeDeals;
     }
 
     public Customer(long id, String name, EnumColor color) {
@@ -58,11 +80,11 @@ public class Customer {
         this.color = color;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -78,7 +100,7 @@ public class Customer {
     public String toString() {
         return "Customer{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", caption='" + name + '\'' +
                 ", color=" + color +
                 '}';
     }
