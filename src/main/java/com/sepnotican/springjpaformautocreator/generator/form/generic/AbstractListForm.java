@@ -6,10 +6,7 @@ import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.data.sort.SortDirection;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -96,7 +93,29 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         //BUTTON REMOVE
         MenuBar.MenuItem menuItemDelete = commandPanel.addItem(DELETE_TEXT, VaadinIcons.FILE_REMOVE,
                 event -> {
-                    //todo
+                    if (grid.getSelectedItems().isEmpty()) return;
+
+                    Set<T> selectedItems = grid.getSelectedItems();
+                    final Label label = new Label(String.format("Do you really want to delete %d elements?",
+                            grid.getSelectedItems().size()));
+                    Window dialog = new Window();
+                    VerticalLayout verticalLayout = new VerticalLayout();
+                    verticalLayout.addComponent(label);
+                    verticalLayout.addComponent(new Button("Yes", event1 -> {
+                        selectedItems.forEach(repository::delete);
+                        this.grid.getDataProvider().refreshAll();
+                        dialog.close();
+                    }));
+
+                    verticalLayout.addComponent(new Button("No", event1 -> {
+                        dialog.close();
+                    }));
+                    dialog.setContent(verticalLayout);
+                    dialog.setModal(true);
+                    dialog.center();
+                    getUI().addWindow(dialog);
+
+//                    selectedItems.forEach(item -> openAbstractElementForm(item, false));
                 });
         addComponent(commandPanel);
     }
