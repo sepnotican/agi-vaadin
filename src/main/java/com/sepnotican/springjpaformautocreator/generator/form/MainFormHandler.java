@@ -85,7 +85,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
             String caption = generateElementCaption(entity, isNewInstance);
 
-            tab.setCaption(agiUI.entityCaption() + ":" + caption);
+            tab.setCaption(caption);
             tab.setIcon(agiUI.icon());
             tab.setVisible(true);
             tab.setClosable(true);
@@ -102,13 +102,14 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
             caption = "new";
         } else {
             for (Field field : entity.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(Id.class)) {
+                if (field.isAnnotationPresent(Id.class)
+                        && entity.getClass().isAnnotationPresent(AgiUI.class)) {
                     field.setAccessible(true);
                     try {
-                        caption = field.get(entity).toString();
+                        caption = entity.getClass().getAnnotation(AgiUI.class).entityCaption()
+                                + ":" + field.get(entity).toString();
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        //todo log
+                        logger.error(e.getMessage());
                     }
                     break;
                 }
