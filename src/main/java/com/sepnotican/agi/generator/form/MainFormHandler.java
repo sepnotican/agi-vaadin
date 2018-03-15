@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     private static final String DEFAULT_ELEMENT_FORM_PREFIX = "DEF_ELEM_";
     private TabSheet tabSheet;
     private Map<String, TabSheet.Tab> openedForms = new HashMap<>();
-    private Layout mainLayout;
+    private AbstractOrderedLayout mainLayout;
 
     @Autowired
     ApplicationContext context;
@@ -32,10 +33,12 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         this.mainLayout = new VerticalLayout();
     }
 
-    public Layout getMainLayout() {
+    @Override
+    public AbstractOrderedLayout getMainLayout() {
         return mainLayout;
     }
 
+    @PostConstruct
     public void init() {
         tabSheet = new TabSheet();
         tabSheet.setCloseHandler(new TabSheet.CloseHandler() {

@@ -2,29 +2,34 @@ package com.sepnotican.agi.generator.form;
 
 
 import com.sepnotican.agi.generator.annotations.AgiUI;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Comparator;
 import java.util.Set;
 
+@Component
 public class MainMenuGenerator {
 
-    private MenuBar menuBar = new MenuBar();
-    private Layout layoutForMenu;
+    @Value("#{environment['com.sepnotican.agi-package']}")
+    public String[] packagesToScan;
+    @Autowired
+    ApplicationContext context;
+    @Autowired
     private IFormHandler listFormHandler;
-    private UIHandler uiHandler;
+    private MenuBar menuBar = new MenuBar();
 
-    public MainMenuGenerator(UIHandler uiHandler, Layout layoutForMenu, IFormHandler listFormHandler) {
-        this.layoutForMenu = layoutForMenu;
-        this.uiHandler = uiHandler;
-        this.listFormHandler = listFormHandler;
+    public MainMenuGenerator() {
     }
 
-    public void init(String[] packagesToScan, ApplicationContext context) {
+    @PostConstruct
+    public void init() {
 
         for (String prefix : packagesToScan) {
 
@@ -45,10 +50,12 @@ public class MainMenuGenerator {
 
                 MenuBar.MenuItem item = menuBar.addItem(agiUI.listCaption(), agiUI.icon(),
                         event -> listFormHandler.showAbstractListForm(aClass, repository));
-                layoutForMenu.addComponent(menuBar);
+                listFormHandler.getMainLayout().addComponent(menuBar, 0);
+
             });
         }
     }
 }
+
 
 

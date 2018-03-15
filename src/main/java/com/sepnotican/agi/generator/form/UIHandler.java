@@ -20,11 +20,12 @@ import java.util.Set;
 
 @Component
 public class UIHandler {
+
+    @Autowired
     MainMenuGenerator mainMenuGenerator;
 
     @Autowired
     MainFormHandler mainFormHandler;
-
 
     @Autowired
     private ApplicationContext context;
@@ -67,16 +68,14 @@ public class UIHandler {
 
 
         });
+        mainFormHandler.getMainLayout().addComponent(btnPopulateDB, 0);
 
-        mainFormHandler.getMainLayout().addComponent(new Label("Auto Generated Interface for Vaadin - example"));
-        mainFormHandler.getMainLayout().addComponent(btnPopulateDB);
         // =========================================
         //DEBUG todo remove
 
-        mainMenuGenerator = new MainMenuGenerator(this, mainFormHandler.getMainLayout(), mainFormHandler);
+        mainFormHandler.getMainLayout().
+                addComponent(new Label("Auto Generated Interface for Vaadin - example"), 0);
 
-        mainMenuGenerator.init(new String[]{"com.sepnotican.springjpaformautocreator.entity"}, context);
-        mainFormHandler.init();
     }
 
     public MainMenuGenerator getMainMenuGenerator() {
