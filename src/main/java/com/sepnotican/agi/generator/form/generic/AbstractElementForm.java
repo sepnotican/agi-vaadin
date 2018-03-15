@@ -64,7 +64,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
             makeUpCaptionForField(field, component);
 
-            component.setSizeUndefined();
+            component.setSizeFull();
             addComponent(component);
 
         }
@@ -74,13 +74,11 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
         setSizeFull();
         setWidth("50%");
-
     }
 
     protected ArrayList<Field> createOrderedElementsList(Field[] fieldsArray) {
-        return new ArrayList<>(Arrays.stream(fieldsArray)
-                .sorted(new UIOrderComparator())
-                .collect(Collectors.toList()));
+        return Arrays.stream(fieldsArray)
+                .sorted(new UIOrderComparator()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     protected void initDefaultControlPanel(Binder<T> binder) {
