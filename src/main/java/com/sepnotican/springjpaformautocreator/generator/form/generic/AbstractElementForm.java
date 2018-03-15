@@ -41,6 +41,7 @@ public class AbstractElementForm<T> extends GridLayout {
     }
 
     public void init(T entity, boolean isNewInstance, String formCachedName) {
+        this.formCachedName = formCachedName;
         removeAllComponents();
 
         this.entity = entity;

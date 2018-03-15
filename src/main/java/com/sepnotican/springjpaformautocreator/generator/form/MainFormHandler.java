@@ -124,7 +124,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         final String newCachedName = generateElementCacheName(agiUI, entity);
         TabSheet.Tab tab = openedForms.get(cachedName);
         if (tab == null) {
-            logger.warn("tab not found for " + entity + "(" + entity.getClass().getCanonicalName() + ")");
+            logger.warn("tab not found for cached name: " + cachedName);
             return;
         }
         tab.setCaption(generateElementCaption(entity, false));
