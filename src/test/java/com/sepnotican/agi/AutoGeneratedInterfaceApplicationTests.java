@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
