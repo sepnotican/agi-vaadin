@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * to define to specific coordinates in the grid
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UIDrawOrder {
+public @interface AgiDrawOrder {
     int drawOrder() default 0;
 
 }
