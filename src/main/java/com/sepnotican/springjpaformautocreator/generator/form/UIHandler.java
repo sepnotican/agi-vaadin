@@ -6,23 +6,35 @@ import com.sepnotican.springjpaformautocreator.entity.TradeDeal;
 import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
 import com.sepnotican.springjpaformautocreator.repository.TradeDealsRepo;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.VerticalLayout;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class UIHandler {
     MainMenuGenerator mainMenuGenerator;
     MainFormHandler mainFormHandler;
     Layout mainLayout;
-    ApplicationContext context;
 
-    public UIHandler(Layout mainLayout, ApplicationContext context) {
-        this.mainLayout = mainLayout;
-        this.context = context;
+    @Autowired
+    private ApplicationContext context;
+
+    public UIHandler() {
+        mainLayout = new VerticalLayout();
+    }
+
+    @PostConstruct
+    public void init() {
+        mainLayout.addComponent(new Label("Auto Generated Interface for Vaadin - example"));
 
         //DEBUG todo remove
         // =========================================
@@ -65,6 +77,17 @@ public class UIHandler {
 
         mainMenuGenerator.init(new String[]{"com.sepnotican.springjpaformautocreator.entity"}, context);
         mainFormHandler.init();
+    }
 
+    public MainMenuGenerator getMainMenuGenerator() {
+        return mainMenuGenerator;
+    }
+
+    public MainFormHandler getMainFormHandler() {
+        return mainFormHandler;
+    }
+
+    public Layout getMainLayout() {
+        return mainLayout;
     }
 }
