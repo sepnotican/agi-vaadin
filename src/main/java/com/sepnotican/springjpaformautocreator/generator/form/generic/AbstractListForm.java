@@ -38,6 +38,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         grid.setHeightUndefined();
         grid.setWidthUndefined();
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
 
         grid.setDataProvider(new PageableDataProvider<T, String>() {
