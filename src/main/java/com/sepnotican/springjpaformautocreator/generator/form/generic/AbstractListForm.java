@@ -8,7 +8,9 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
+import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,9 +26,10 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     private static final String DELETE_TEXT = "Delete";
     private static final String CREATE_TEXT = "Create";
     private IFormHandler formHandler;
-    private Class aClass;
+    private final static Logger logger = Logger.getLogger(AbstractListForm.class);
     private R repository;
     private Grid<T> grid;
+    private Class<T> aClass;
 
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
@@ -73,21 +76,43 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createCommandPanel() {
         MenuBar commandPanel = new MenuBar();
+        //BUTTON NEW
+        MenuBar.MenuItem menuItemCreate = commandPanel.addItem(CREATE_TEXT, VaadinIcons.FILE_ADD,
+                event -> {
+                    try {
+                        T newObject = aClass.newInstance();
+                        openAbstractElementForm(newObject, true);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        handleError("Error is appeared while instantiating new object ", e);
+                    }
+                });
+        //BUTTON OPEN
         MenuBar.MenuItem menuItemOpen = commandPanel.addItem(OPEN_TEXT, VaadinIcons.FOLDER_OPEN,
                 event -> {
                     if (grid.getSelectedItems().isEmpty()) return;
                     Set<T> selectedItems = grid.getSelectedItems();
-                    selectedItems.forEach(item -> formHandler.showAbstractElementForm(aClass, repository, item));
+                    selectedItems.forEach(item -> openAbstractElementForm(item, false));
                 });
-        MenuBar.MenuItem menuItemCreate = commandPanel.addItem(CREATE_TEXT, VaadinIcons.FOLDER_OPEN,
-                event -> {
-                    //todo
-                });
-        MenuBar.MenuItem menuItemDelete = commandPanel.addItem(DELETE_TEXT, VaadinIcons.FOLDER_OPEN,
+        //BUTTON REMOVE
+        MenuBar.MenuItem menuItemDelete = commandPanel.addItem(DELETE_TEXT, VaadinIcons.FILE_REMOVE,
                 event -> {
                     //todo
                 });
         addComponent(commandPanel);
+    }
+
+    protected void openAbstractElementForm(T item, boolean isNewInstance) {
+        try {
+            formHandler.showAbstractElementForm(repository, item, isNewInstance);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            handleError("Error is appeared while creating abstract element form", e);
+        }
+    }
+
+    protected void handleError(String userMessage, Exception e) {
+        userMessage += " for class :\n" + aClass.getCanonicalName();
+        Notification.show("Error", userMessage, Notification.Type.ERROR_MESSAGE);
+        logger.error(userMessage + '\n' + e.getMessage());
     }
 
 }

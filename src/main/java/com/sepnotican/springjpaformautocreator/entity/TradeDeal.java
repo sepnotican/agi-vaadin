@@ -1,6 +1,6 @@
 package com.sepnotican.springjpaformautocreator.entity;
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.GenerateUI;
+import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.sepnotican.springjpaformautocreator.repository.TradeDealsRepo;
 
@@ -8,9 +8,10 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "trade_deals")
-@GenerateUI(listCaption = "Trade deals",
+@AgiUI(listCaption = "Trade deals",
         entityCaption = "Trade deal",
-        repo = TradeDealsRepo.class)
+        repo = TradeDealsRepo.class,
+        idFieldName = "id")
 public class TradeDeal {
 
     @Column

@@ -1,7 +1,7 @@
 package com.sepnotican.springjpaformautocreator.generator.form;
 
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.GenerateUI;
+import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;
@@ -28,14 +28,14 @@ public class MainMenuGenerator {
         for (String prefix : packagesToScan) {
 
             Reflections reflections = new Reflections(prefix);
-            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(GenerateUI.class);
+            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AgiUI.class);
 
             for (Class<?> aClass : annotated) {
-                GenerateUI generateUI = aClass.getAnnotation(GenerateUI.class);
-                Class repositoryClass = generateUI.repo();
+                AgiUI agiUI = aClass.getAnnotation(AgiUI.class);
+                Class repositoryClass = agiUI.repo();
                 JpaRepository repository = (JpaRepository) context.getBean(repositoryClass);
 
-                MenuBar.MenuItem item = menuBar.addItem(generateUI.listCaption(), generateUI.icon(),
+                MenuBar.MenuItem item = menuBar.addItem(agiUI.listCaption(), agiUI.icon(),
                         event -> listFormHandler.showAbstractListForm(aClass, repository));
             }
 

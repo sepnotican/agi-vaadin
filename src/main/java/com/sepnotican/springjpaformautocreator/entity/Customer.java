@@ -1,10 +1,10 @@
 package com.sepnotican.springjpaformautocreator.entity;
 
 import com.sepnotican.springjpaformautocreator.EnumColor;
+import com.sepnotican.springjpaformautocreator.generator.annotations.AgiDrawOrder;
+import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
 import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
-import com.sepnotican.springjpaformautocreator.generator.annotations.GenerateUI;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
-import com.sepnotican.springjpaformautocreator.generator.annotations.UIDrawOrder;
 import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
 
 import javax.persistence.*;
@@ -12,20 +12,21 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@GenerateUI(listCaption = "Our Customers ",
+@AgiUI(listCaption = "Our Customers ",
         entityCaption = "Customer",
-        repo = CustomerRepo.class)
+        repo = CustomerRepo.class,
+        idFieldName = "id")
 public class Customer {
 
     @Id
     @GeneratedValue
     @Synonym("Identifier")
-    @UIDrawOrder(drawOrder = -1)
+    @AgiDrawOrder(drawOrder = -1)
     private Long id;
 
     @Column
     @Synonym("Customer caption")
-    @UIDrawOrder(drawOrder = 2)
+    @AgiDrawOrder(drawOrder = 2)
     private String name;
 
     @Column
@@ -35,7 +36,7 @@ public class Customer {
 
     @Column
     @Synonym("Color")
-    @UIDrawOrder(drawOrder = 5)
+    @AgiDrawOrder(drawOrder = 5)
     private EnumColor color;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)

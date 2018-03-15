@@ -10,12 +10,14 @@ import java.lang.annotation.RetentionPolicy;
  * in {@link com.sepnotican.springjpaformautocreator.generator.form.MainMenuGenerator}
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GenerateUI {
+public @interface AgiUI {
     String listCaption();
 
     String entityCaption();
 
-    VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
-
     Class repo();
+
+    String idFieldName();
+
+    VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
 }

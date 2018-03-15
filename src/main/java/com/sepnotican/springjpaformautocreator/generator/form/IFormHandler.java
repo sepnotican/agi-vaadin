@@ -3,8 +3,10 @@ package com.sepnotican.springjpaformautocreator.generator.form;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IFormHandler {
-    <T> void showAbstractListForm(Class<?> aClass, JpaRepository<T, Object> jpaRepository);
+    <T> void showAbstractListForm(Class<T> aClass, JpaRepository<T, Object> jpaRepository);
 
-    <T> void showAbstractElementForm(Class<?> aClass, JpaRepository<T, Object> jpaRepository, T entity);
+    <T> void showAbstractElementForm(JpaRepository<T, Object> jpaRepository
+            , T entity, boolean isNewInstance) throws NoSuchFieldException, IllegalAccessException;
 
+    <T> void refreshElementCaption(T entity, String formCachedName) throws NoSuchFieldException, IllegalAccessException;
 }

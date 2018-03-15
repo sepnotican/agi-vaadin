@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class UIHandler {
     MainMenuGenerator mainMenuGenerator;
-    MainFormContainer mainFormContainer;
+    MainFormHandler mainFormHandler;
     Layout mainLayout;
     ApplicationContext context;
 
@@ -60,11 +60,11 @@ public class UIHandler {
         // =========================================
         //DEBUG todo remove
 
-        mainFormContainer = new MainFormContainer(this, mainLayout);
-        mainMenuGenerator = new MainMenuGenerator(this, mainLayout, mainFormContainer);
+        mainFormHandler = new MainFormHandler(this, mainLayout);
+        mainMenuGenerator = new MainMenuGenerator(this, mainLayout, mainFormHandler);
 
         mainMenuGenerator.init(new String[]{"com.sepnotican.springjpaformautocreator.entity"}, context);
-        mainFormContainer.init();
+        mainFormHandler.init();
 
     }
 }
