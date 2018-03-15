@@ -32,7 +32,7 @@ public class JpaConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        entityManagerFactoryBean.setPackagesToScan("com.sepnotican.springjpaformautocreator.entity");
+        entityManagerFactoryBean.setPackagesToScan("com.sepnotican.agi.entity");
 
         Properties jpaProperties = new Properties();
 
