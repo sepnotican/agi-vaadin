@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-public class AbstractElementForm<T> extends GridLayout {
+public class AbstractElementForm<T> extends VerticalLayout {
 
     public static final String BTN_SAVE_TEXT = "Save";
     public static final String BTN_RELOAD_TEXT = "Reload";
@@ -100,7 +100,6 @@ public class AbstractElementForm<T> extends GridLayout {
         MenuBar.MenuItem menuItemReload = menuBar.addItem(BTN_RELOAD_TEXT,
                 VaadinIcons.REFRESH,
                 event -> binder.readBean(entity));
-
 
         defaultControlPanel.addComponent(menuBar);
         addComponent(defaultControlPanel);

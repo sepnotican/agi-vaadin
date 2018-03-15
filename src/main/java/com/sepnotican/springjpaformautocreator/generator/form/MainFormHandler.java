@@ -97,17 +97,18 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     }
 
     protected <T> String generateElementCaption(T entity, boolean isNewInstance) {
-        String caption = "undefined";
+        if (!entity.getClass().isAnnotationPresent(AgiUI.class))
+            throw new RuntimeException("Unacceptable class, annotation AgiUI is necessary");
+
+        String caption = entity.getClass().getAnnotation(AgiUI.class).entityCaption() + ':';
         if (isNewInstance) {
-            caption = "new";
+            caption += "new";
         } else {
             for (Field field : entity.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(Id.class)
-                        && entity.getClass().isAnnotationPresent(AgiUI.class)) {
+                if (field.isAnnotationPresent(Id.class)) {
                     field.setAccessible(true);
                     try {
-                        caption = entity.getClass().getAnnotation(AgiUI.class).entityCaption()
-                                + ":" + field.get(entity).toString();
+                        caption += field.get(entity).toString();
                     } catch (IllegalAccessException e) {
                         logger.error(e.getMessage());
                     }
