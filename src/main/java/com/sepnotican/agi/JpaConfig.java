@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

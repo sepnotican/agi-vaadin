@@ -1,11 +1,11 @@
-package com.sepnotican.springjpaformautocreator.entity;
+package com.sepnotican.agi.entity;
 
-import com.sepnotican.springjpaformautocreator.EnumColor;
-import com.sepnotican.springjpaformautocreator.generator.annotations.AgiDrawOrder;
-import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
-import com.sepnotican.springjpaformautocreator.generator.annotations.BigString;
-import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
-import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
+import com.sepnotican.agi.EnumColor;
+import com.sepnotican.agi.generator.annotations.AgiDrawOrder;
+import com.sepnotican.agi.generator.annotations.AgiUI;
+import com.sepnotican.agi.generator.annotations.BigString;
+import com.sepnotican.agi.generator.annotations.Synonym;
+import com.sepnotican.agi.repository.CustomerRepo;
 
 import javax.persistence.*;
 import java.util.Set;

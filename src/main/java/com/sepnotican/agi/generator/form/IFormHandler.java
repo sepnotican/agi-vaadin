@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.agi.generator.form;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

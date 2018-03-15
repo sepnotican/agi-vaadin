@@ -1,7 +1,7 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.agi.generator.form;
 
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
+import com.sepnotican.agi.generator.annotations.AgiUI;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;

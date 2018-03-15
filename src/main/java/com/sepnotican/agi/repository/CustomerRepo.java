@@ -1,6 +1,6 @@
-package com.sepnotican.springjpaformautocreator.repository;
+package com.sepnotican.agi.repository;
 
-import com.sepnotican.springjpaformautocreator.entity.Customer;
+import com.sepnotican.agi.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

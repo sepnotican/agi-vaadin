@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
 public enum EnumColor {
     RED, GREEN, BLUE, WHITE, BLACK

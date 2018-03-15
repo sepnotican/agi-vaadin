@@ -1,7 +1,7 @@
-package com.sepnotican.springjpaformautocreator.generator.form.generic;
+package com.sepnotican.agi.generator.form.generic;
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.*;
-import com.sepnotican.springjpaformautocreator.generator.form.IFormHandler;
+import com.sepnotican.agi.generator.annotations.*;
+import com.sepnotican.agi.generator.form.IFormHandler;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;

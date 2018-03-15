@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

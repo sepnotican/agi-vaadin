@@ -1,6 +1,6 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
-import com.sepnotican.springjpaformautocreator.generator.form.UIHandler;
+import com.sepnotican.agi.generator.form.UIHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;

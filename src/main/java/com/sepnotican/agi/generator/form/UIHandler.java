@@ -1,10 +1,10 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.agi.generator.form;
 
-import com.sepnotican.springjpaformautocreator.EnumColor;
-import com.sepnotican.springjpaformautocreator.entity.Customer;
-import com.sepnotican.springjpaformautocreator.entity.TradeDeal;
-import com.sepnotican.springjpaformautocreator.repository.CustomerRepo;
-import com.sepnotican.springjpaformautocreator.repository.TradeDealsRepo;
+import com.sepnotican.agi.EnumColor;
+import com.sepnotican.agi.entity.Customer;
+import com.sepnotican.agi.entity.TradeDeal;
+import com.sepnotican.agi.repository.CustomerRepo;
+import com.sepnotican.agi.repository.TradeDealsRepo;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;

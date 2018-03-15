@@ -1,4 +1,4 @@
-package com.sepnotican.springjpaformautocreator;
+package com.sepnotican.agi;
 
 import com.vaadin.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.data.provider.Query;

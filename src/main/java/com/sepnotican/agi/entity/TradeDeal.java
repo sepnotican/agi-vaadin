@@ -1,9 +1,9 @@
-package com.sepnotican.springjpaformautocreator.entity;
+package com.sepnotican.agi.entity;
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
-import com.sepnotican.springjpaformautocreator.generator.annotations.LinkedObject;
-import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
-import com.sepnotican.springjpaformautocreator.repository.TradeDealsRepo;
+import com.sepnotican.agi.generator.annotations.AgiUI;
+import com.sepnotican.agi.generator.annotations.LinkedObject;
+import com.sepnotican.agi.generator.annotations.Synonym;
+import com.sepnotican.agi.repository.TradeDealsRepo;
 
 import javax.persistence.*;
 

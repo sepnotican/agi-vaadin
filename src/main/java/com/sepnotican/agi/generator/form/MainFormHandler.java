@@ -1,8 +1,8 @@
-package com.sepnotican.springjpaformautocreator.generator.form;
+package com.sepnotican.agi.generator.form;
 
-import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
-import com.sepnotican.springjpaformautocreator.generator.form.generic.AbstractElementForm;
-import com.sepnotican.springjpaformautocreator.generator.form.generic.AbstractListForm;
+import com.sepnotican.agi.generator.annotations.AgiUI;
+import com.sepnotican.agi.generator.form.generic.AbstractElementForm;
+import com.sepnotican.agi.generator.form.generic.AbstractListForm;
 import com.vaadin.ui.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

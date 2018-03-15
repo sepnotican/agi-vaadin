@@ -1,7 +1,7 @@
-package com.sepnotican.springjpaformautocreator.generator.form.generic;
+package com.sepnotican.agi.generator.form.generic;
 
-import com.sepnotican.springjpaformautocreator.PageableDataProvider;
-import com.sepnotican.springjpaformautocreator.generator.form.IFormHandler;
+import com.sepnotican.agi.PageableDataProvider;
+import com.sepnotican.agi.generator.form.IFormHandler;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;

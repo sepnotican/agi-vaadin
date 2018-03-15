@@ -1,6 +1,6 @@
-package com.sepnotican.springjpaformautocreator.generator.annotations;
+package com.sepnotican.agi.generator.annotations;
 
-import com.sepnotican.springjpaformautocreator.generator.form.generic.AbstractElementForm;
+import com.sepnotican.agi.generator.form.generic.AbstractElementForm;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
