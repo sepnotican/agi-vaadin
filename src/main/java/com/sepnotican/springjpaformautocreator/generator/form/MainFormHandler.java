@@ -5,6 +5,8 @@ import com.sepnotican.springjpaformautocreator.generator.form.generic.AbstractEl
 import com.sepnotican.springjpaformautocreator.generator.form.generic.AbstractListForm;
 import com.vaadin.ui.*;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.Id;
@@ -12,20 +14,26 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+@org.springframework.stereotype.Component
 public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
     private static final String DEFAULT_LIST_FORM_PREFIX = "DEF_LIST_";
     private static final String DEFAULT_ELEMENT_FORM_PREFIX = "DEF_ELEM_";
     private TabSheet tabSheet;
-    private UIHandler uiHandler;
     private Map<String, TabSheet.Tab> openedForms = new HashMap<>();
     private Layout mainLayout;
 
+    @Autowired
+    ApplicationContext context;
+
     private static final Logger logger = Logger.getLogger(MainFormHandler.class);
 
-    public MainFormHandler(UIHandler uiHandler, Layout mainLayout) {
-        this.uiHandler = uiHandler;
-        this.mainLayout = mainLayout;
+    public MainFormHandler() {
+        this.mainLayout = new VerticalLayout();
+    }
+
+    public Layout getMainLayout() {
+        return mainLayout;
     }
 
     public void init() {
@@ -79,7 +87,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         TabSheet.Tab tab;
         tab = openedForms.get(formCacheName);
         if (tab == null) {
-            AbstractElementForm<T> elemForm = new AbstractElementForm<T>(jpaRepository, this);
+            AbstractElementForm<T> elemForm = new AbstractElementForm<T>(jpaRepository, this, context);
             elemForm.init(entity, isNewInstance, formCacheName);
             tab = tabSheet.addTab(elemForm);
 

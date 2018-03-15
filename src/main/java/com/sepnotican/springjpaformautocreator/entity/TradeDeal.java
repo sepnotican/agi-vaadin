@@ -1,6 +1,7 @@
 package com.sepnotican.springjpaformautocreator.entity;
 
 import com.sepnotican.springjpaformautocreator.generator.annotations.AgiUI;
+import com.sepnotican.springjpaformautocreator.generator.annotations.LinkedObject;
 import com.sepnotican.springjpaformautocreator.generator.annotations.Synonym;
 import com.sepnotican.springjpaformautocreator.repository.TradeDealsRepo;
 
@@ -17,6 +18,7 @@ public class TradeDeal {
     @Column
     @Synonym("Summ of the deal")
     double sum;
+    @LinkedObject
     @Synonym("Customer")
     @ManyToOne
     @JoinColumn(name = "customer_id")
