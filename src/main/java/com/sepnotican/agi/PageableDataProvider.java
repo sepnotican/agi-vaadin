@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  */
 public abstract class PageableDataProvider<T, F> extends AbstractBackEndDataProvider<T, F> {
 
-    private static Order queryOrderToSpringOrder(QuerySortOrder queryOrder) {
+    public static Order queryOrderToSpringOrder(QuerySortOrder queryOrder) {
         return new Order(queryOrder.getDirection() == SortDirection.ASCENDING
                 ? Direction.ASC
                 : Direction.DESC, queryOrder.getSorted());
