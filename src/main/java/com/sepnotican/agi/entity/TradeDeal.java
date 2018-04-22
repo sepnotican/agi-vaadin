@@ -59,4 +59,13 @@ public class TradeDeal {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    @Override
+    public String toString() {
+        return "TradeDeal{" +
+                "id=" + id +
+                ", C=" + customer +
+                ", $=" + sum +
+                '}';
+    }
 }
