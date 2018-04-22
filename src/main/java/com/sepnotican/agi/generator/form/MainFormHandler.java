@@ -3,7 +3,10 @@ package com.sepnotican.agi.generator.form;
 import com.sepnotican.agi.generator.annotations.AgiUI;
 import com.sepnotican.agi.generator.form.generic.AbstractElementForm;
 import com.sepnotican.agi.generator.form.generic.AbstractListForm;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractOrderedLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,18 +44,14 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     @PostConstruct
     public void init() {
         tabSheet = new TabSheet();
-        tabSheet.setCloseHandler(new TabSheet.CloseHandler() {
-            @Override
-            public void onTabClose(TabSheet tabsheet,
-                                   Component tabContent) {
-                TabSheet.Tab tab = tabsheet.getTab(tabContent);
-                Notification.show("Closing " + tab.getCaption());
+        tabSheet.setCloseHandler((TabSheet.CloseHandler) (tabsheet, tabContent) -> {
+            TabSheet.Tab tab = tabsheet.getTab(tabContent);
+            Notification.show("Closing " + tab.getCaption());
 
-                if (openedForms.containsValue(tab)) {
-                    openedForms.entrySet().removeIf((entry) -> entry.getValue().equals(tab));
-                }
-                tabsheet.removeTab(tab);
+            if (openedForms.containsValue(tab)) {
+                openedForms.entrySet().removeIf((entry) -> entry.getValue().equals(tab));
             }
+            tabsheet.removeTab(tab);
         });
 
         this.addComponent(tabSheet);

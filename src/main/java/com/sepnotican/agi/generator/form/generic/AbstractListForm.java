@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
@@ -67,10 +68,17 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
         grid.removeAllColumns();
         for (Field field : aClass.getDeclaredFields()) {
-            grid.addColumn(field.getName());
+            if (isNotIgnoredType(field.getType())) {
+                grid.addColumn(field.getName());
+            }
         }
 
         addComponent(grid);
+    }
+
+    protected boolean isNotIgnoredType(Class<?> type) {
+        return !type.isAssignableFrom(Set.class)
+                && !type.isAssignableFrom(Map.class);
     }
 
     protected void createCommandPanel() {
