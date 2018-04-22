@@ -33,6 +33,11 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         this.repository = repository;
         this.aClass = aClass;
 
+        createCommandPanel();
+        createGrid(aClass, repository);
+    }
+
+    private void createGrid(Class aClass, R repository) {
         grid = new Grid<T>(aClass);
 
         grid.setHeightUndefined();
@@ -65,11 +70,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             grid.addColumn(field.getName());
         }
 
-
-        createCommandPanel();
-
         addComponent(grid);
-
     }
 
     protected void createCommandPanel() {
