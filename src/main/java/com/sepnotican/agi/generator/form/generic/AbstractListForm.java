@@ -37,7 +37,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         createGrid(aClass, repository);
     }
 
-    private void createGrid(Class aClass, R repository) {
+    protected void createGrid(Class aClass, R repository) {
         grid = new Grid<T>(aClass);
 
         grid.setHeightUndefined();
