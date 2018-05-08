@@ -1,10 +1,7 @@
 package com.sepnotican.agi.entity;
 
 import com.sepnotican.agi.EnumColor;
-import com.sepnotican.agi.generator.annotations.AgiDrawOrder;
-import com.sepnotican.agi.generator.annotations.AgiUI;
-import com.sepnotican.agi.generator.annotations.BigString;
-import com.sepnotican.agi.generator.annotations.Synonym;
+import com.sepnotican.agi.generator.annotations.*;
 import com.sepnotican.agi.repository.CustomerRepo;
 
 import javax.persistence.*;
@@ -16,6 +13,7 @@ import java.util.Set;
         entityCaption = "Customer",
         repo = CustomerRepo.class,
         idFieldName = "id")
+@RepresentationResolver("fullname")
 public class Customer {
 
     @Id
@@ -50,6 +48,11 @@ public class Customer {
         this.description = description;
         this.color = color;
         this.tradeDeals = tradeDeals;
+    }
+
+    @RepresentationResolver("fullname")
+    public String getFullName() {
+        return this.id + ":" + this.name;
     }
 
     public Set<TradeDeal> getTradeDeals() {

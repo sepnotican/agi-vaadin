@@ -1,7 +1,9 @@
 package com.sepnotican.agi.generator.form.generic;
 
 import com.sepnotican.agi.PageableDataProvider;
+import com.sepnotican.agi.generator.annotations.RepresentationResolver;
 import com.sepnotican.agi.generator.form.IFormHandler;
+import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +73,38 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         grid.removeAllColumns();
         for (Field field : aClass.getDeclaredFields()) {
             if (isNotIgnoredType(field.getType())) {
-                grid.addColumn(field.getName());
+                if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
+                    String methodQualifier = field.getType().getAnnotation(RepresentationResolver.class).value();
+                    for (Method method : field.getType().getDeclaredMethods()) {
+                        if (method.isAnnotationPresent(RepresentationResolver.class) &&
+                                method.getAnnotation(RepresentationResolver.class).value().equals(methodQualifier)) {
+                            Grid.Column<T, String> column = grid.addColumn(new ValueProvider<T, String>() {
+                                @Override
+                                public String apply(T t) {
+                                    try {
+                                        Object classMember;
+                                        if (!field.isAccessible()) {
+                                            field.setAccessible(true);
+                                            classMember = field.get(t);
+                                            field.setAccessible(false);
+                                        } else classMember = field.get(t);
+                                        return (String) method.invoke(classMember);
+                                    } catch (IllegalAccessException | InvocationTargetException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return null;
+                                }
+                            });
+                            column.setCaption(field.getType().getSimpleName());
+                            break;
+                        }
+                    }
+                } else grid.addColumn(field.getName());
             }
         }
 
         addComponent(grid);
+
     }
 
     protected boolean isNotIgnoredType(Class<?> type) {
