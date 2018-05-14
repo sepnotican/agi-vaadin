@@ -61,7 +61,8 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
             tabsheet.removeTab(tab);
         });
 
-        tabSheet.setSizeFull();
+//        tabSheet.setSizeFull();
+        tabSheet.setHeight("100%");
         mainLayout.addComponent(tabSheet);
         mainLayout.setExpandRatio(tabSheet, 1.0f);
         this.addComponent(mainLayout);

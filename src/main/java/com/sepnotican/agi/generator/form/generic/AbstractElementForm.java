@@ -73,17 +73,11 @@ public class AbstractElementForm<T> extends VerticalLayout {
                 ((HasValue) component).setReadOnly(true);
 
             makeUpCaptionForField(field, component);
-
-            component.setSizeFull();
             addComponent(component);
-
+            component.setWidth(40f, Unit.PERCENTAGE);
         }
         binder.bindInstanceFields(entity);
-
         if (!isNewInstance) binder.readBean(entity);
-
-        setSizeFull();
-        setWidth("50%");
     }
 
     protected ArrayList<Field> createOrderedElementsList(Field[] fieldsArray) {
@@ -93,9 +87,21 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
     protected void initDefaultControlPanel(Binder<T> binder) {
         defaultControlPanel = new HorizontalLayout();
-
         MenuBar menuBar = new MenuBar();
-        MenuBar.MenuItem menuItemSave = menuBar.addItem(BTN_SAVE_TEXT,
+        createSaveButton(binder, menuBar);
+        createReloadButton(binder, menuBar);
+        defaultControlPanel.addComponent(menuBar);
+        addComponent(defaultControlPanel);
+    }
+
+    protected void createReloadButton(Binder<T> binder, MenuBar menuBar) {
+        menuBar.addItem(BTN_RELOAD_TEXT,
+                VaadinIcons.REFRESH,
+                event -> binder.readBean(entity));
+    }
+
+    protected void createSaveButton(Binder<T> binder, MenuBar menuBar) {
+        menuBar.addItem(BTN_SAVE_TEXT,
                 VaadinIcons.CHECK,
                 event -> {
                     try {
@@ -108,17 +114,6 @@ public class AbstractElementForm<T> extends VerticalLayout {
                         logger.error("Error while saving element: " + entity.getClass().getCanonicalName());
                     }
                 });
-
-        MenuBar.MenuItem menuItemReload = menuBar.addItem(BTN_RELOAD_TEXT,
-                VaadinIcons.REFRESH,
-                event -> binder.readBean(entity));
-
-        defaultControlPanel.addComponent(menuBar);
-        addComponent(defaultControlPanel);
-    }
-
-    public String getFormCachedName() {
-        return formCachedName;
     }
 
     protected void makeUpCaptionForField(Field field, Component component) {
