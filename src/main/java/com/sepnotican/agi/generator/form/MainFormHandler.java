@@ -34,12 +34,18 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     private Logger logger;
 
     public MainFormHandler() {
-        this.mainLayout = new VerticalLayout();
+        mainLayout = new VerticalLayout();
+        mainLayout.setHeightUndefined();
+        mainLayout.setSizeFull();
+        mainLayout.setSpacing(false);
+        mainLayout.setMargin(false);
+        this.setHeightUndefined();
+        this.setSizeFull();
     }
 
     @Override
     public AbstractOrderedLayout getMainLayout() {
-        return mainLayout;
+        return this;
     }
 
     @PostConstruct
@@ -55,8 +61,11 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
             tabsheet.removeTab(tab);
         });
 
-        this.addComponent(tabSheet);
-        mainLayout.addComponent(this);
+        tabSheet.setSizeFull();
+        mainLayout.addComponent(tabSheet);
+        mainLayout.setExpandRatio(tabSheet, 1.0f);
+        this.addComponent(mainLayout);
+        this.setExpandRatio(mainLayout, 1.0f);
     }
 
     public <T> void showAbstractListForm(Class<T> aClass, JpaRepository<T, Object> jpaRepository) {

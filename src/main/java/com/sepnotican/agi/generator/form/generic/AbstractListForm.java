@@ -50,6 +50,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         this.formHandler = formHandler;
         this.repository = repository;
         this.aClass = aClass;
+        this.setHeightUndefined();
     }
 
     @PostConstruct
@@ -98,7 +99,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             }
         }
 
-        addComponent(grid);
+        addComponentsAndExpand(grid);
 
     }
 

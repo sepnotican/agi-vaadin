@@ -16,6 +16,7 @@ public class MainUI extends UI {
     protected void init(VaadinRequest vaadinRequest) {
 
         setContent(uiHandler.getMainLayout());
+        setSizeFull();
     }
 
 
