@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 
 @Component
@@ -90,7 +91,10 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             if (isNotIgnoredType(field.getType())) {
                 if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
                     buildFieldRepresentationResolver(field);
-                } else grid.addColumn(field.getName());
+                } else {
+                    grid.addColumn(field.getName());
+                }
+
             }
         }
 
@@ -121,6 +125,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                     }
                 });
                 column.setCaption(field.getType().getSimpleName());
+                column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
+                column.setSortable(true);
                 break;
             }
         }
