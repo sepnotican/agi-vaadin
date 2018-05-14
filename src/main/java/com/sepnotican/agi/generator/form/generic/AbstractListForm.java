@@ -9,11 +9,16 @@ import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,13 +27,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+@Component
+@Scope("prototype")
 public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
 
-    private static final String OPEN_TEXT = "Open";
-    private static final String DELETE_TEXT = "Delete";
-    private static final String CREATE_TEXT = "Create";
+    @Autowired
+    private Logger logger;
+    @Value("${agi.forms.list.new}")
+    private String CREATE_TEXT;
+    @Value("${agi.forms.list.open}")
+    private String OPEN_TEXT;
+    @Value("${agi.forms.list.delete}")
+    private String DELETE_TEXT;
     private IFormHandler formHandler;
-    private final static Logger logger = Logger.getLogger(AbstractListForm.class);
     private R repository;
     private Grid<T> grid;
     private Class<T> aClass;
@@ -37,7 +49,10 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         this.formHandler = formHandler;
         this.repository = repository;
         this.aClass = aClass;
+    }
 
+    @PostConstruct
+    protected void init() {
         createCommandPanel();
         createGrid(aClass, repository);
     }
@@ -74,37 +89,41 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         for (Field field : aClass.getDeclaredFields()) {
             if (isNotIgnoredType(field.getType())) {
                 if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
-                    String methodQualifier = field.getType().getAnnotation(RepresentationResolver.class).value();
-                    for (Method method : field.getType().getDeclaredMethods()) {
-                        if (method.isAnnotationPresent(RepresentationResolver.class) &&
-                                method.getAnnotation(RepresentationResolver.class).value().equals(methodQualifier)) {
-                            Grid.Column<T, String> column = grid.addColumn(new ValueProvider<T, String>() {
-                                @Override
-                                public String apply(T t) {
-                                    try {
-                                        Object classMember;
-                                        if (!field.isAccessible()) {
-                                            field.setAccessible(true);
-                                            classMember = field.get(t);
-                                            field.setAccessible(false);
-                                        } else classMember = field.get(t);
-                                        return (String) method.invoke(classMember);
-                                    } catch (IllegalAccessException | InvocationTargetException e) {
-                                        e.printStackTrace();
-                                    }
-                                    return null;
-                                }
-                            });
-                            column.setCaption(field.getType().getSimpleName());
-                            break;
-                        }
-                    }
+                    buildFieldRepresentationResolver(field);
                 } else grid.addColumn(field.getName());
             }
         }
 
         addComponent(grid);
 
+    }
+
+    protected void buildFieldRepresentationResolver(Field field) {
+        String methodQualifier = field.getType().getAnnotation(RepresentationResolver.class).value();
+        for (Method method : field.getType().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(RepresentationResolver.class) &&
+                    method.getAnnotation(RepresentationResolver.class).value().equals(methodQualifier)) {
+                Grid.Column<T, String> column = grid.addColumn(new ValueProvider<T, String>() {
+                    @Override
+                    public String apply(T t) {
+                        try {
+                            Object classMember;
+                            if (!field.isAccessible()) {
+                                field.setAccessible(true);
+                                classMember = field.get(t);
+                                field.setAccessible(false);
+                            } else classMember = field.get(t);
+                            if (classMember != null) return (String) method.invoke(classMember);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            logger.error(e.getMessage());
+                        }
+                        return null;
+                    }
+                });
+                column.setCaption(field.getType().getSimpleName());
+                break;
+            }
+        }
     }
 
     protected boolean isNotIgnoredType(Class<?> type) {
@@ -114,25 +133,14 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createCommandPanel() {
         MenuBar commandPanel = new MenuBar();
-        //BUTTON NEW
-        MenuBar.MenuItem menuItemCreate = commandPanel.addItem(CREATE_TEXT, VaadinIcons.FILE_ADD,
-                event -> {
-                    try {
-                        T newObject = aClass.newInstance();
-                        openAbstractElementForm(newObject, true);
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        handleError("Error is appeared while instantiating new object ", e);
-                    }
-                });
-        //BUTTON OPEN
-        MenuBar.MenuItem menuItemOpen = commandPanel.addItem(OPEN_TEXT, VaadinIcons.FOLDER_OPEN,
-                event -> {
-                    if (grid.getSelectedItems().isEmpty()) return;
-                    Set<T> selectedItems = grid.getSelectedItems();
-                    selectedItems.forEach(item -> openAbstractElementForm(item, false));
-                });
-        //BUTTON REMOVE
-        MenuBar.MenuItem menuItemDelete = commandPanel.addItem(DELETE_TEXT, VaadinIcons.FILE_REMOVE,
+        createMenuButtonNew(commandPanel);
+        createMenuButtonOpen(commandPanel);
+        createMenuButtonRemove(commandPanel);
+        addComponent(commandPanel);
+    }
+
+    protected void createMenuButtonRemove(MenuBar commandPanel) {
+        commandPanel.addItem(DELETE_TEXT, VaadinIcons.FILE_REMOVE,
                 event -> {
                     if (grid.getSelectedItems().isEmpty()) return;
 
@@ -147,7 +155,6 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                         this.grid.getDataProvider().refreshAll();
                         dialog.close();
                     }));
-
                     verticalLayout.addComponent(new Button("No", event1 -> {
                         dialog.close();
                     }));
@@ -155,10 +162,28 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                     dialog.setModal(true);
                     dialog.center();
                     getUI().addWindow(dialog);
-
-//                    selectedItems.forEach(item -> openAbstractElementForm(item, false));
                 });
-        addComponent(commandPanel);
+    }
+
+    protected void createMenuButtonOpen(MenuBar commandPanel) {
+        commandPanel.addItem(OPEN_TEXT, VaadinIcons.FOLDER_OPEN,
+                event -> {
+                    if (grid.getSelectedItems().isEmpty()) return;
+                    Set<T> selectedItems = grid.getSelectedItems();
+                    selectedItems.forEach(item -> openAbstractElementForm(item, false));
+                });
+    }
+
+    protected void createMenuButtonNew(MenuBar commandPanel) {
+        commandPanel.addItem(CREATE_TEXT, VaadinIcons.FILE_ADD,
+                event -> {
+                    try {
+                        T newObject = aClass.newInstance();
+                        openAbstractElementForm(newObject, true);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        handleError("Error is appeared while instantiating new object ", e);
+                    }
+                });
     }
 
     protected void openAbstractElementForm(T item, boolean isNewInstance) {

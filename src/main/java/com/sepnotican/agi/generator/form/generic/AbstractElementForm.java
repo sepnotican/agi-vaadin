@@ -9,8 +9,11 @@ import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
@@ -19,25 +22,32 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+@org.springframework.stereotype.Component
+@Scope("prototype")
 public class AbstractElementForm<T> extends VerticalLayout {
 
-    public static final String BTN_SAVE_TEXT = "Save";
-    public static final String BTN_RELOAD_TEXT = "Reload";
-    public static final String EMPTY_ENUM_TEXT = "<empty>";
-    private final static Logger logger = Logger.getLogger(AbstractElementForm.class);
+    @Value("${agi.forms.element.save}")
+    private String BTN_SAVE_TEXT;
+    @Value("${agi.forms.element.reload}")
+    private String BTN_RELOAD_TEXT;
+    @Value("${agi.forms.element.enum-null-selection}")
+    private String EMPTY_ENUM_TEXT;
+    @Autowired
+    private Logger logger;
     protected T entity;
     protected Binder<T> binder;
     protected Layout defaultControlPanel;
     protected IFormHandler formHandler;
     protected String formCachedName;
 
+    @Autowired
     private ApplicationContext context;
+
     private JpaRepository<T, Object> repository;
 
-    public AbstractElementForm(JpaRepository<T, Object> repository, IFormHandler formHandler, ApplicationContext context) {
+    public AbstractElementForm(IFormHandler formHandler, JpaRepository<T, Object> repository) {
         this.repository = repository;
         this.formHandler = formHandler;
-        this.context = context;
     }
 
     public void init(T entity, boolean isNewInstance, String formCachedName) {

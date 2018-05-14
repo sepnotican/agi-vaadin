@@ -7,7 +7,7 @@ import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,7 +30,8 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     @Autowired
     ApplicationContext context;
 
-    private static final Logger logger = Logger.getLogger(MainFormHandler.class);
+    @Autowired
+    private Logger logger;
 
     public MainFormHandler() {
         this.mainLayout = new VerticalLayout();
@@ -64,7 +65,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         TabSheet.Tab tab;
         tab = openedForms.get(formCacheName);
         if (tab == null) {
-            AbstractListForm<T, JpaRepository<T, Object>> listForm = new AbstractListForm<>(this, aClass, jpaRepository);
+            AbstractListForm<T, JpaRepository<T, Object>> listForm = context.getBean(AbstractListForm.class, this, aClass, jpaRepository);
             tab = tabSheet.addTab(listForm);
             tab.setCaption(aClass.getAnnotation(AgiUI.class).listCaption());
             tab.setIcon(aClass.getAnnotation(AgiUI.class).icon());
@@ -89,7 +90,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         TabSheet.Tab tab;
         tab = openedForms.get(formCacheName);
         if (tab == null) {
-            AbstractElementForm<T> elemForm = new AbstractElementForm<T>(jpaRepository, this, context);
+            AbstractElementForm<T> elemForm = context.getBean(AbstractElementForm.class, this, jpaRepository);
             elemForm.init(entity, isNewInstance, formCacheName);
             tab = tabSheet.addTab(elemForm);
 
