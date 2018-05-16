@@ -48,46 +48,35 @@ public class GenericFieldGenerator {
         } else if (field.isAnnotationPresent(LinkedObject.class)) {
             component = generateLinkedObjectField(field);
         } else {
-            logger.error("Not implemented cast for {}", field.getType().getCanonicalName());
+            logger.error("getComponentByField(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
         }
-
+        makeUpCaptionForField(field, component);
         return component;
     }
 
     protected com.vaadin.ui.Component getComponentByFieldAndBind(Field field, Binder binder) {
-        com.vaadin.ui.Component component;
-        if (field.getType().equals(Long.class)
-                || field.getType().equals(long.class)) {
-            component = generateLongField(field);
+        com.vaadin.ui.Component component = getComponentByField(field);
+        if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
             binder.forField((HasValue) component)
                     .withConverter(new StringToLongConverter("Must be a Long value"))
                     .bind(field.getName());
-        } else if (field.getType().equals(Double.class)
-                || field.getType().equals(double.class)) {
-            component = generateDoubleFieild(field);
+        } else if (field.getType().equals(Double.class) || field.getType().equals(double.class)) {
             binder.forField((HasValue) component)
                     .withConverter(new StringToDoubleConverter("Must be a double value"))
                     .bind(field.getName());
         } else if (field.getType().equals(Float.class) || field.getType().equals(float.class)) {
-            component = generateFloatFieild(field);
             binder.forField((HasValue) component)
                     .withConverter(new StringToFloatConverter("Must be a float value"))
                     .bind(field.getName());
-        } else if (field.getType().equals(String.class)) {
-            component = generateStringField(field);
-            binder.bind((HasValue) component, field.getName());
-        } else if (field.getType().isEnum()) {
-            component = generateEnumField(field);
-            binder.bind((HasValue) component, field.getName());
-        } else if (field.isAnnotationPresent(LinkedObject.class)) {
-            component = generateLinkedObjectField(field);
+        } else if (field.getType().equals(String.class)
+                || field.getType().isEnum()
+                || field.isAnnotationPresent(LinkedObject.class)) {
             binder.bind((HasValue) component, field.getName());
         } else {
-            logger.error("Not implemented cast for {}", field.getType().getCanonicalName());
+            logger.error("getComponentByFieldAndBind(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
         }
-
         return component;
     }
 
@@ -134,9 +123,14 @@ public class GenericFieldGenerator {
             comboBox.setCaption(field.getName());
         }
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-//        comboBox.setItems(repository.findAll());
         comboBox.setDataProvider(new RepositoryDataProvider<>(repository));
 
         return comboBox;
+    }
+
+    protected void makeUpCaptionForField(Field field, com.vaadin.ui.Component component) {
+        if (field.isAnnotationPresent(Synonym.class)) {
+            component.setCaption(field.getAnnotation(Synonym.class).value());
+        } else component.setCaption(field.getName());
     }
 }

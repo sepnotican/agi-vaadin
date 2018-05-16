@@ -1,12 +1,16 @@
 package com.sepnotican.agi.core.form.generic;
 
-import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.UIOrderComparator;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,10 +70,10 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
             if (component == null) continue;
 
-            if (field.isAnnotationPresent(javax.persistence.Id.class))
+            if (field.isAnnotationPresent(javax.persistence.Id.class)) {
                 ((HasValue) component).setReadOnly(true);
+            }
 
-            makeUpCaptionForField(field, component);
             addComponent(component);
             component.setWidth(40f, Unit.PERCENTAGE);
         }
@@ -111,12 +115,6 @@ public class AbstractElementForm<T> extends VerticalLayout {
                         logger.error("Error while saving element: " + entity.getClass().getCanonicalName());
                     }
                 });
-    }
-
-    protected void makeUpCaptionForField(Field field, Component component) {
-        if (field.isAnnotationPresent(Synonym.class)) {
-            component.setCaption(field.getAnnotation(Synonym.class).value());
-        } else component.setCaption(field.getName());
     }
 
 
