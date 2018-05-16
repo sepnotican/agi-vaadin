@@ -1,7 +1,7 @@
-package com.sepnotican.agi.generator.form;
+package com.sepnotican.agi.core.form;
 
 
-import com.sepnotican.agi.generator.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiUI;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;

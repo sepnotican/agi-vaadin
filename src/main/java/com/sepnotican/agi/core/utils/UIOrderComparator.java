@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.form.utils;
+package com.sepnotican.agi.core.utils;
 
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
 

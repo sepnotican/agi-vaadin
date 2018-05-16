@@ -1,8 +1,8 @@
-package com.sepnotican.agi.generator.form.generic;
+package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.PageableDataProvider;
-import com.sepnotican.agi.generator.annotations.RepresentationResolver;
-import com.sepnotican.agi.generator.form.IFormHandler;
+import com.sepnotican.agi.core.annotations.RepresentationResolver;
+import com.sepnotican.agi.core.form.IFormHandler;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;

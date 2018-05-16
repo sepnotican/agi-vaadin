@@ -1,8 +1,8 @@
-package com.sepnotican.agi.generator.form;
+package com.sepnotican.agi.core.form;
 
-import com.sepnotican.agi.generator.annotations.AgiUI;
-import com.sepnotican.agi.generator.form.generic.AbstractElementForm;
-import com.sepnotican.agi.generator.form.generic.AbstractListForm;
+import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.form.generic.AbstractElementForm;
+import com.sepnotican.agi.core.form.generic.AbstractListForm;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;

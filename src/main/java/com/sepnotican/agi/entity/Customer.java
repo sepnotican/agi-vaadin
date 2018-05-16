@@ -1,7 +1,7 @@
 package com.sepnotican.agi.entity;
 
 import com.sepnotican.agi.EnumColor;
-import com.sepnotican.agi.generator.annotations.*;
+import com.sepnotican.agi.core.annotations.*;
 import com.sepnotican.agi.repository.CustomerRepo;
 
 import javax.persistence.*;

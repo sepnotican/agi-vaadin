@@ -1,4 +1,4 @@
-package com.sepnotican.agi.generator.form;
+package com.sepnotican.agi.core.form;
 
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;

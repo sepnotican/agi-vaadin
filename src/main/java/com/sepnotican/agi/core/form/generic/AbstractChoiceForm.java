@@ -1,4 +1,4 @@
-package com.sepnotican.agi.generator.form.generic;
+package com.sepnotican.agi.core.form.generic;
 
 public class AbstractChoiceForm {
 }
