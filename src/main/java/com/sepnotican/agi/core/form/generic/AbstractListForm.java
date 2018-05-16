@@ -2,9 +2,12 @@ package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
-import com.sepnotican.agi.core.utils.RepositoryDataProvider;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
+import com.vaadin.data.provider.CallbackDataProvider;
+import com.vaadin.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -50,6 +53,10 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     @Autowired
     GenericFieldGenerator fieldGenerator;
 
+    protected DataProvider<T, String> gridDataProvider;
+    protected ConfigurableFilterDataProvider<T, Void, String> wrapper;
+    protected EntityDataService<T> entityDataService;
+
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
         this.repository = repository;
@@ -59,10 +66,30 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @PostConstruct
     protected void init() {
+        initializeGridDataProvider();
         createCommandPanel();
         createFilterLayout();
         createFilers();
         createGrid();
+    }
+
+    private void initializeGridDataProvider() {
+        entityDataService = new EntityDataService<>(repository);
+//        gridDataProvider = new RepositoryDataProvider<T, String>(repository);
+        gridDataProvider = DataProvider.fromFilteringCallbacks(
+                new CallbackDataProvider.FetchCallback<T, String>() {
+                    @Override
+                    public Stream<T> fetch(Query<T, String> query) {
+                        // getFilter returns Optional<String>
+                        String filter = query.getFilter().orElse("");
+                        //return entityDataService.getItems(query.getOffset(), query.getLimit(), query.getSortOrders(), filter);
+                        return repository.findAll().stream();
+                    }
+                },
+//                query -> entityDataService.count()
+                query -> (int) repository.count()
+        );
+        wrapper = gridDataProvider.withConfigurableFilter();
     }
 
     private void createFilterLayout() {
@@ -78,7 +105,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         grid.setWidthUndefined();
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        grid.setDataProvider(new RepositoryDataProvider<T>(repository));
+        grid.setDataProvider(wrapper);
 
         createGridColumns();
         addComponentsAndExpand(grid);
@@ -86,14 +113,20 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createFilers() {
         for (Field field : aClass.getDeclaredFields()) {
-            logger.warn("Hello dbg");
             com.vaadin.ui.Component componentByField = fieldGenerator.getComponentByField(field);
 
             if (componentByField == null) continue;
 
-            ((HasValue) componentByField).addValueChangeListener(event -> {
-                logger.warn(((HasValue) componentByField).getValue().toString());
+            ((HasValue) componentByField).addValueChangeListener(new HasValue.ValueChangeListener() {
+                @Override
+                public void valueChange(HasValue.ValueChangeEvent event) {
+
+                    wrapper.setFilter(event.getValue().toString());
+//                    grid.setDataProvider(wrapper);
+                    logger.warn(((HasValue) componentByField).getValue().toString());
+                }
             });
+
             filterLayout.addComponent(componentByField);
         }
     }

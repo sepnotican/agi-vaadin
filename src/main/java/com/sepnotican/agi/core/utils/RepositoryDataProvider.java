@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryDataProvider<T> extends PageableDataProvider {
+public class RepositoryDataProvider<T, F> extends PageableDataProvider {
 
     private JpaRepository repository;
 
