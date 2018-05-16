@@ -110,8 +110,8 @@ public class GenericFieldGenerator {
     protected com.vaadin.ui.Component generateLinkedObjectField(Field field) {
         if (!field.getType().isAnnotationPresent(AgiUI.class)) {
             logger.error("Attempt to create field without AgiUI annotation. " +
-                    "\nClassname = " + field.getClass().getCanonicalName() +
-                    "\nField name = " + field.getName());
+                    "Classname = " + field.getClass().getCanonicalName() +
+                    "Field name = " + field.getName());
             return null;
         }
         Class repositoryClass = field.getType().getAnnotation(AgiUI.class).repo();
