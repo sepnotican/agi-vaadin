@@ -1,6 +1,6 @@
-package com.sepnotican.agi.repository;
+package com.sepnotican.agi.example.repository;
 
-import com.sepnotican.agi.entity.Customer;
+import com.sepnotican.agi.example.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

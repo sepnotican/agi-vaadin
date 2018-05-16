@@ -1,10 +1,10 @@
-package com.sepnotican.agi;
+package com.sepnotican.agi.example;
 
 import com.sepnotican.agi.core.form.IUIHandler;
-import com.sepnotican.agi.entity.Customer;
-import com.sepnotican.agi.entity.TradeDeal;
-import com.sepnotican.agi.repository.CustomerRepo;
-import com.sepnotican.agi.repository.TradeDealsRepo;
+import com.sepnotican.agi.example.entity.Customer;
+import com.sepnotican.agi.example.entity.TradeDeal;
+import com.sepnotican.agi.example.repository.CustomerRepo;
+import com.sepnotican.agi.example.repository.TradeDealsRepo;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
@@ -34,7 +34,7 @@ public class MainUI extends UI {
 
         Button btnPopulateDB = new Button("Populate DB");
         btnPopulateDB.addClickListener(getClickListener());
-        uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
+        //uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
     }
 
     private Button.ClickListener getClickListener() {

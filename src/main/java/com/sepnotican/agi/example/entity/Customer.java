@@ -1,8 +1,8 @@
-package com.sepnotican.agi.entity;
+package com.sepnotican.agi.example.entity;
 
-import com.sepnotican.agi.EnumColor;
 import com.sepnotican.agi.core.annotations.*;
-import com.sepnotican.agi.repository.CustomerRepo;
+import com.sepnotican.agi.example.EnumColor;
+import com.sepnotican.agi.example.repository.CustomerRepo;
 
 import javax.persistence.*;
 import java.util.Set;

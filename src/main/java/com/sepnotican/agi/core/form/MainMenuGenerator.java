@@ -17,7 +17,7 @@ import java.util.Set;
 @Component
 public class MainMenuGenerator {
 
-    @Value("#{environment['com.sepnotican.agi-package']}")
+    @Value("${com.sepnotican.agi-package}")
     public String[] packagesToScan;
     @Autowired
     ApplicationContext context;

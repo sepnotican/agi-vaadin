@@ -1,9 +1,9 @@
-package com.sepnotican.agi.entity;
+package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.repository.TradeDealsRepo;
+import com.sepnotican.agi.example.repository.TradeDealsRepo;
 
 import javax.persistence.*;
 

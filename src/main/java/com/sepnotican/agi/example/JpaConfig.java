@@ -1,4 +1,4 @@
-package com.sepnotican.agi;
+package com.sepnotican.agi.example;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -32,7 +32,7 @@ public class JpaConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        entityManagerFactoryBean.setPackagesToScan("com.sepnotican.agi.entity");
+        entityManagerFactoryBean.setPackagesToScan("com.sepnotican.agi.example.entity");
 
         Properties jpaProperties = new Properties();
 

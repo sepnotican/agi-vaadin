@@ -10,7 +10,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @ComponentScan
-@PropertySource("classpath:messages.properties")
+@PropertySource({"classpath:messages.properties", "classpath:agiconfig.properties"})
 public class AppConfig {
 
     @Bean
