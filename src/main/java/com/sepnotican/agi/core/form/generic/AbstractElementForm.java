@@ -1,16 +1,10 @@
 package com.sepnotican.agi.core.form.generic;
 
-import com.sepnotican.agi.core.annotations.AgiUI;
-import com.sepnotican.agi.core.annotations.BigString;
-import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.UIOrderComparator;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
-import com.vaadin.data.converter.StringToDoubleConverter;
-import com.vaadin.data.converter.StringToFloatConverter;
-import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.*;
 import org.slf4j.Logger;
@@ -30,21 +24,21 @@ import java.util.stream.Collectors;
 public class AbstractElementForm<T> extends VerticalLayout {
 
     @Value("${agi.forms.element.save}")
-    private String BTN_SAVE_TEXT;
+    protected String BTN_SAVE_TEXT;
     @Value("${agi.forms.element.reload}")
-    private String BTN_RELOAD_TEXT;
-    @Value("${agi.forms.element.enum-null-selection}")
-    private String EMPTY_ENUM_TEXT;
+    protected String BTN_RELOAD_TEXT;
     @Autowired
     private Logger logger;
+    @Autowired
+    GenericFieldGenerator fieldGenerator;
+    @Autowired
+    private ApplicationContext context;
+
     protected T entity;
     protected Binder<T> binder;
     protected Layout defaultControlPanel;
     protected IFormHandler formHandler;
     protected String formCachedName;
-
-    @Autowired
-    private ApplicationContext context;
 
     private JpaRepository<T, Object> repository;
 
@@ -68,7 +62,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
         for (Field field : fieldArrayList) {
 
-            Component component = getComponentByFieldAndBind(field, binder);
+            Component component = fieldGenerator.getComponentByFieldAndBind(field, binder);
 
             if (component == null) continue;
 
@@ -125,88 +119,5 @@ public class AbstractElementForm<T> extends VerticalLayout {
         } else component.setCaption(field.getName());
     }
 
-    protected Component getComponentByFieldAndBind(Field field, Binder binder) {
-        if (field.getType().equals(Long.class)
-                || field.getType().equals(long.class)) {
-            return generateLongField(field, binder);
 
-        } else if (field.getType().equals(Double.class)
-                || field.getType().equals(double.class)) {
-            return generateDoubleFieild(field, binder);
-
-        } else if (field.getType().equals(Float.class)
-                || field.getType().equals(float.class)) {
-            return generateFloatFieild(field, binder);
-
-        } else if (field.getType().equals(String.class)) {
-            return generateStringField(field, binder);
-
-        } else if (field.getType().isEnum()) {
-            return generateEnumField(field, binder);
-
-        } else return generateLinkedObjectField(field, binder);
-    }
-
-    protected Component generateFloatFieild(Field field, Binder binder) {
-        TextField textField = new TextField(field.getName());
-        binder.forField(textField)
-                .withConverter(new StringToFloatConverter("Must be a float value"))
-                .bind(field.getName());
-        return textField;
-    }
-
-    protected Component generateDoubleFieild(Field field, Binder binder) {
-        TextField textField = new TextField(field.getName());
-        binder.forField(textField)
-                .withConverter(new StringToDoubleConverter("Must be a double value"))
-                .bind(field.getName());
-        return textField;
-    }
-
-    protected Component generateEnumField(Field field, Binder binder) {
-        ComboBox comboBox = new ComboBox<>();
-        comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        comboBox.setItems(field.getType().getEnumConstants());
-        binder.bind(comboBox, field.getName());
-        return comboBox;
-    }
-
-    protected Component generateStringField(Field field, Binder binder) {
-
-        Component textField = null;
-        if (field.isAnnotationPresent(BigString.class)) {
-            textField = new TextArea();
-        } else textField = new TextField();
-        binder.bind((HasValue) textField, field.getName());
-        return textField;
-    }
-
-    protected Component generateLongField(Field field, Binder binder) {
-        TextField textField = new TextField(field.getName());
-        binder.forField(textField)
-                .withConverter(new StringToLongConverter("Must be a Long value"))
-                .bind(field.getName());
-        return textField;
-    }
-
-    protected Component generateLinkedObjectField(Field field, Binder binder) {
-
-        if (!field.isAnnotationPresent(LinkedObject.class)) return null;
-        if (!field.getType().isAnnotationPresent(AgiUI.class)) {
-            logger.warn("Attempt to create field without AgiUI annotation. " +
-                    "\nClassname = " + field.getClass().getCanonicalName() +
-                    "\nField name = " + field.getName());
-            return null;
-        }
-
-        Class repositoryClass = field.getType().getAnnotation(AgiUI.class).repo();
-        JpaRepository repository = (JpaRepository) context.getBean(repositoryClass);
-
-        ComboBox comboBox = new ComboBox<>();
-        comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        comboBox.setItems(repository.findAll());
-
-        binder.bind(comboBox, field.getName());
-        return comboBox;
-    }
 }

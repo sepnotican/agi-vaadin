@@ -32,19 +32,19 @@ import java.util.stream.Stream;
 @Component
 @Scope("prototype")
 public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
-
     @Autowired
-    private Logger logger;
+    protected Logger logger;
     @Value("${agi.forms.list.new}")
-    private String CREATE_TEXT;
+    protected String CREATE_TEXT;
     @Value("${agi.forms.list.open}")
-    private String OPEN_TEXT;
+    protected String OPEN_TEXT;
     @Value("${agi.forms.list.delete}")
-    private String DELETE_TEXT;
-    private IFormHandler formHandler;
-    private R repository;
-    private Grid<T> grid;
-    private Class<T> aClass;
+    protected String DELETE_TEXT;
+    protected IFormHandler formHandler;
+    protected R repository;
+    protected Grid<T> grid;
+    protected Class<T> aClass;
+    protected HorizontalLayout filterLayout;
 
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
@@ -56,10 +56,16 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     @PostConstruct
     protected void init() {
         createCommandPanel();
-        createGrid(aClass, repository);
+        createFilterLayout();
+        createFilers();
+        createGrid();
     }
 
-    protected void createGrid(Class aClass, R repository) {
+    private void createFilterLayout() {
+        filterLayout = new HorizontalLayout();
+    }
+
+    protected void createGrid() {
         grid = new Grid<T>(aClass);
 
         grid.setHeightUndefined();
@@ -87,6 +93,18 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             }
         });
 
+        createGridColumns();
+        addComponentsAndExpand(grid);
+    }
+
+    protected void createFilers() {
+        for (Field field : aClass.getDeclaredFields()) {
+//            field.getType()
+//            filterLayout.addComponent();
+        }
+    }
+
+    protected void createGridColumns() {
         grid.removeAllColumns();
         for (Field field : aClass.getDeclaredFields()) {
             if (isNotIgnoredType(field.getType())) {
@@ -95,12 +113,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                 } else {
                     grid.addColumn(field.getName());
                 }
-
             }
         }
-
-        addComponentsAndExpand(grid);
-
     }
 
     protected void buildFieldRepresentationResolver(Field field) {

@@ -37,7 +37,7 @@ public class Customer {
     @AgiDrawOrder(drawOrder = 5)
     private EnumColor color;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
     public Customer() {
