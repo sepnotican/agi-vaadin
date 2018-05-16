@@ -2,7 +2,7 @@ package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
-import com.sepnotican.agi.example.PageableDataProvider;
+import com.sepnotican.agi.core.utils.PageableDataProvider;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;

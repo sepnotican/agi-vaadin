@@ -1,4 +1,4 @@
-package com.sepnotican.agi.example;
+package com.sepnotican.agi.core.utils;
 
 import com.vaadin.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.data.provider.Query;
