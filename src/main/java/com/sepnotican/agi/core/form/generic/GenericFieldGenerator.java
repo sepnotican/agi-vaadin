@@ -4,14 +4,12 @@ import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.core.utils.PageableDataProvider;
+import com.sepnotican.agi.core.utils.RepositoryDataProvider;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
-import com.vaadin.data.provider.Query;
-import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -19,13 +17,10 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 @Component
 public class GenericFieldGenerator {
@@ -139,23 +134,8 @@ public class GenericFieldGenerator {
             comboBox.setCaption(field.getName());
         }
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        comboBox.setItems(repository.findAll());
-        comboBox.setDataProvider(new PageableDataProvider() {
-            @Override
-            protected Page fetchFromBackEnd(Query query, Pageable pageable) {
-                return null;
-            }
-
-            @Override
-            protected List<QuerySortOrder> getDefaultSortOrders() {
-                return null;
-            }
-
-            @Override
-            protected int sizeInBackEnd(Query query) {
-                return 0;
-            }
-        });
+//        comboBox.setItems(repository.findAll());
+        comboBox.setDataProvider(new RepositoryDataProvider<>(repository));
 
         return comboBox;
     }
