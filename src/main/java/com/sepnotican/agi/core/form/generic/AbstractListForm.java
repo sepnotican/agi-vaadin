@@ -3,6 +3,7 @@ package com.sepnotican.agi.core.form.generic;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.RepositoryDataProvider;
+import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
@@ -71,14 +72,12 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @SuppressWarnings("unchecked")
     protected void createGrid() {
-        grid = new Grid<T>(aClass);
+        grid = new Grid<>(aClass);
 
         grid.setHeightUndefined();
         grid.setWidthUndefined();
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-
-
         grid.setDataProvider(new RepositoryDataProvider<T>(repository));
 
         createGridColumns();
@@ -87,17 +86,15 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createFilers() {
         for (Field field : aClass.getDeclaredFields()) {
+            logger.warn("Hello dbg");
             com.vaadin.ui.Component componentByField = fieldGenerator.getComponentByField(field);
 
             if (componentByField == null) continue;
 
-            componentByField.addListener(event -> {
-
+            ((HasValue) componentByField).addValueChangeListener(event -> {
+                logger.warn(((HasValue) componentByField).getValue().toString());
             });
             filterLayout.addComponent(componentByField);
-
-//            field.getType()
-//            filterLayout.addComponent();
         }
     }
 
