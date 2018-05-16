@@ -2,19 +2,22 @@ package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
-import com.sepnotican.agi.core.utils.PageableDataProvider;
+import com.sepnotican.agi.core.utils.RepositoryDataProvider;
 import com.vaadin.data.ValueProvider;
-import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.shared.data.sort.SortDirection;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +25,6 @@ import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -45,6 +46,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     protected Grid<T> grid;
     protected Class<T> aClass;
     protected HorizontalLayout filterLayout;
+    @Autowired
+    GenericFieldGenerator fieldGenerator;
 
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
@@ -63,8 +66,10 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     private void createFilterLayout() {
         filterLayout = new HorizontalLayout();
+        addComponent(filterLayout);
     }
 
+    @SuppressWarnings("unchecked")
     protected void createGrid() {
         grid = new Grid<T>(aClass);
 
@@ -74,24 +79,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
 
-        grid.setDataProvider(new PageableDataProvider<T, String>() {
-            @Override
-            protected Page<T> fetchFromBackEnd(Query<T, String> query, Pageable pageable) {
-                return repository.findAll(pageable);
-            }
-
-            @Override
-            protected List<QuerySortOrder> getDefaultSortOrders() {
-                List<QuerySortOrder> list = new ArrayList<>();
-                list.add(new QuerySortOrder("id", SortDirection.ASCENDING));
-                return list;
-            }
-
-            @Override
-            protected int sizeInBackEnd(Query<T, String> query) {
-                return (int) repository.count();
-            }
-        });
+        grid.setDataProvider(new RepositoryDataProvider<T>(repository));
 
         createGridColumns();
         addComponentsAndExpand(grid);
@@ -99,6 +87,15 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void createFilers() {
         for (Field field : aClass.getDeclaredFields()) {
+            com.vaadin.ui.Component componentByField = fieldGenerator.getComponentByField(field);
+
+            if (componentByField == null) continue;
+
+            componentByField.addListener(event -> {
+
+            });
+            filterLayout.addComponent(componentByField);
+
 //            field.getType()
 //            filterLayout.addComponent();
         }
