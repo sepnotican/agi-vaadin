@@ -1,6 +1,10 @@
-package com.sepnotican.agi.generator.form.generic;
+package com.sepnotican.agi.core.form.generic;
 
-import com.sepnotican.agi.generator.annotations.*;
+import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.BigString;
+import com.sepnotican.agi.core.annotations.LinkedObject;
+import com.sepnotican.agi.core.annotations.Synonym;
+import com.sepnotican.agi.core.form.utils.UIOrderComparator;
 import com.sepnotican.agi.generator.form.IFormHandler;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
@@ -19,7 +23,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -205,29 +208,5 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
         binder.bind(comboBox, field.getName());
         return comboBox;
-    }
-
-    protected class UIOrderComparator implements Comparator<Field> {
-
-        @Override
-        public int compare(Field o1, Field o2) {
-            if (!o1.isAnnotationPresent(AgiDrawOrder.class)
-                    && o2.isAnnotationPresent(AgiDrawOrder.class))
-                return 1;
-            else if (o1.isAnnotationPresent(AgiDrawOrder.class)
-                    && !o2.isAnnotationPresent(AgiDrawOrder.class))
-                return -1;
-            else if (!o1.isAnnotationPresent(AgiDrawOrder.class)
-                    && !o2.isAnnotationPresent(AgiDrawOrder.class))
-                return 0;
-            else if (o1.getAnnotation(AgiDrawOrder.class).drawOrder() >
-                    o2.getAnnotation(AgiDrawOrder.class).drawOrder())
-                return 1;
-            else if ((o1.getAnnotation(AgiDrawOrder.class).drawOrder() <
-                    o2.getAnnotation(AgiDrawOrder.class).drawOrder()))
-                return -1;
-
-            return 0;
-        }
     }
 }

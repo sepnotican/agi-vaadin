@@ -1,12 +1,11 @@
-package com.sepnotican.agi.generator.annotations;
+package com.sepnotican.agi.core.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RepresentationResolver {
-    String value();
+@Target(ElementType.FIELD)
+public @interface LinkedObject {
 }

@@ -1,6 +1,6 @@
-package com.sepnotican.agi.generator.annotations;
+package com.sepnotican.agi.core.annotations;
 
-import com.sepnotican.agi.generator.form.generic.AbstractElementForm;
+import com.sepnotican.agi.core.form.generic.AbstractElementForm;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

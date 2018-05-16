@@ -1,4 +1,4 @@
-package com.sepnotican.agi.generator.annotations;
+package com.sepnotican.agi.core.annotations;
 
 import com.vaadin.icons.VaadinIcons;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation points to create main menu with annotated element
- * in {@link com.sepnotican.agi.generator.form.MainMenuGenerator}
+ * in {@link com.sepnotican.agi.core.form.MainMenuGenerator}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
