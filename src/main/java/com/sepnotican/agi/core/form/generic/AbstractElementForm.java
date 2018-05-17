@@ -11,7 +11,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
 @Scope("prototype")
+@Slf4j
 public class AbstractElementForm<T> extends VerticalLayout {
 
     @Value("${agi.forms.element.save}")
     protected String BTN_SAVE_TEXT;
     @Value("${agi.forms.element.reload}")
     protected String BTN_RELOAD_TEXT;
-    @Autowired
-    private Logger logger;
+
     @Autowired
     GenericFieldGenerator fieldGenerator;
     @Autowired
@@ -112,7 +112,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
                         formHandler.refreshElementCaption(entity, formCachedName);
                     } catch (Exception e) {
                         Notification.show("Error", "Error while saving element", Notification.Type.ERROR_MESSAGE);
-                        logger.error("Error while saving element: " + entity.getClass().getCanonicalName());
+                        log.error("Error while saving element: " + entity.getClass().getCanonicalName());
                     }
                 });
     }

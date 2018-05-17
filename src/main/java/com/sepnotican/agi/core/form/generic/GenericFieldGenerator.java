@@ -13,7 +13,7 @@ import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -23,11 +23,10 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 
 @Component
+@Slf4j
 public class GenericFieldGenerator {
     @Value("${agi.forms.element.enum-null-selection}")
     protected String EMPTY_ENUM_TEXT;
-    @Autowired
-    private Logger logger;
     @Autowired
     private ApplicationContext context;
 
@@ -48,7 +47,7 @@ public class GenericFieldGenerator {
         } else if (field.isAnnotationPresent(LinkedObject.class)) {
             component = generateLinkedObjectField(field);
         } else {
-            logger.error("getComponentByField(): not implemented cast for {}", field.getType().getCanonicalName());
+            log.error("getComponentByField(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
         }
         makeUpCaptionForField(field, component);
@@ -74,7 +73,7 @@ public class GenericFieldGenerator {
                 || field.isAnnotationPresent(LinkedObject.class)) {
             binder.bind((HasValue) component, field.getName());
         } else {
-            logger.error("getComponentByFieldAndBind(): not implemented cast for {}", field.getType().getCanonicalName());
+            log.error("getComponentByFieldAndBind(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
         }
         return component;
@@ -109,7 +108,7 @@ public class GenericFieldGenerator {
 
     protected com.vaadin.ui.Component generateLinkedObjectField(Field field) {
         if (!field.getType().isAnnotationPresent(AgiUI.class)) {
-            logger.error("Attempt to create field without AgiUI annotation. " +
+            log.error("Attempt to create field without AgiUI annotation. " +
                     "Classname = " + field.getClass().getCanonicalName() +
                     "Field name = " + field.getName());
             return null;

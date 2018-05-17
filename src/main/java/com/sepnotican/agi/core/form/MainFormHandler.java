@@ -7,7 +7,7 @@ import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @org.springframework.stereotype.Component
+@Slf4j
 public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
     private static final String DEFAULT_LIST_FORM_PREFIX = "DEF_LIST_";
@@ -29,9 +30,6 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
     @Autowired
     ApplicationContext context;
-
-    @Autowired
-    private Logger logger;
 
     public MainFormHandler() {
         mainLayout = new VerticalLayout();
@@ -131,7 +129,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
                     try {
                         caption += field.get(entity).toString();
                     } catch (IllegalAccessException e) {
-                        logger.error(e.getMessage());
+                        log.error(e.getMessage());
                     }
                     break;
                 }
@@ -147,7 +145,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         final String newCachedName = generateElementCacheName(agiUI, entity);
         TabSheet.Tab tab = openedForms.get(cachedName);
         if (tab == null) {
-            logger.warn("tab not found for cached name: " + cachedName);
+            log.warn("tab not found for cached name: " + cachedName);
             return;
         }
         tab.setCaption(generateElementCaption(entity, false));

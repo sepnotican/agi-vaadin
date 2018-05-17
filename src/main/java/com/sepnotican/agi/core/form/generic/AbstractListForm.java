@@ -18,7 +18,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -36,9 +36,9 @@ import java.util.stream.Stream;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
-    @Autowired
-    protected Logger logger;
+
     @Value("${agi.forms.list.new}")
     protected String CREATE_TEXT;
     @Value("${agi.forms.list.open}")
@@ -123,7 +123,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
                     wrapper.setFilter(event.getValue().toString());
 //                    grid.setDataProvider(wrapper);
-                    logger.warn(((HasValue) componentByField).getValue().toString());
+                    log.warn(((HasValue) componentByField).getValue().toString());
                 }
             });
 
@@ -161,7 +161,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                             } else classMember = field.get(t);
                             if (classMember != null) return (String) method.invoke(classMember);
                         } catch (IllegalAccessException | InvocationTargetException e) {
-                            logger.error(e.getMessage());
+                            log.error(e.getMessage());
                         }
                         return null;
                     }
@@ -245,7 +245,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     protected void handleError(String userMessage, Exception e) {
         userMessage += " for class :\n" + aClass.getCanonicalName();
         Notification.show("Error", userMessage, Notification.Type.ERROR_MESSAGE);
-        logger.error(userMessage + '\n' + e.getMessage());
+        log.error(userMessage + '\n' + e.getMessage());
     }
 
 }
