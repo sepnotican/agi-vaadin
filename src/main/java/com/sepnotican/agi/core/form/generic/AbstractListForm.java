@@ -1,6 +1,5 @@
 package com.sepnotican.agi.core.form.generic;
 
-import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.CompareType;
@@ -82,20 +81,11 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @SuppressWarnings("unchecked")
     private void initializeGridDataProvider() {
-        gridDataProvider = DataProvider.fromFilteringCallbacks(
-                (CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>) query -> {
-                    if (filterSet.size() > 0)
-                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).stream();
-                    else
-                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(ImmutableSet.of()).stream();
-                },
-                query -> {
-                    if (filterSet.size() > 0)
-                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).size();
-                    else
-                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(ImmutableSet.of()).size();
-                }
+        gridDataProvider = DataProvider.fromFilteringCallbacks((CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>)
+                        query -> genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).stream(),
+                query -> genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).size()
         );
+
         wrapper = gridDataProvider.withConfigurableFilter();
     }
 
