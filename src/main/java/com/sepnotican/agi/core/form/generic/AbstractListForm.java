@@ -60,8 +60,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @Autowired
     GenericFieldGenerator fieldGenerator;
-    protected DataProvider<T, CriteriaFilter> gridDataProvider;
-    protected ConfigurableFilterDataProvider<T, Void, CriteriaFilter> wrapper;
+    protected DataProvider<T, Set<CriteriaFilter>> gridDataProvider;
+    protected ConfigurableFilterDataProvider<T, Void, Set<CriteriaFilter>> wrapper;
     @Autowired
     private GenericCriteriaFetcherFactory repositoryFactory;
 
@@ -83,20 +83,18 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     private void initializeGridDataProvider() {
         gridDataProvider = DataProvider.fromFilteringCallbacks(
-                new CallbackDataProvider.FetchCallback<T, CriteriaFilter>() {
+                new CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>() {
                     @Override
-                    public Stream<T> fetch(Query<T, CriteriaFilter> query) {
-                        CriteriaFilter criteriaFilter = query.getFilter().orElse(null);
-                        if (criteriaFilter != null)
-                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of(criteriaFilter)).stream();
+                    public Stream<T> fetch(Query<T, Set<CriteriaFilter>> query) {
+                        if (filterSet.size() > 0)
+                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(filterSet).stream();
                         else
                             return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).stream();
                     }
                 },
                 query -> {
-                    CriteriaFilter criteriaFilter = query.getFilter().orElse(null);
-                    if (criteriaFilter != null)
-                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of(criteriaFilter)).size();
+                    if (filterSet.size() > 0)
+                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(filterSet).size();
                     else
                         return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).size();
                 }
@@ -132,14 +130,22 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             ((HasValue) componentByField).addValueChangeListener(new HasValue.ValueChangeListener() {
                 @Override
                 public void valueChange(HasValue.ValueChangeEvent event) {
-                    CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue().toString(), CompareType.STARTS_WITH);
-                    wrapper.setFilter(criteriaFilter);
-                    log.info(criteriaFilter.toString());
+                    CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue(), getFieldCompareType(field));
+
+                    filterSet.remove(criteriaFilter);
+                    filterSet.add(criteriaFilter);
+                    log.warn(criteriaFilter.toString());
+                    wrapper.setFilter(filterSet);
                 }
             });
 
             filterLayout.addComponent(componentByField);
         }
+    }
+
+    private CompareType getFieldCompareType(Field field) {
+        if (field.getType() == String.class) return CompareType.LIKE;
+        return CompareType.EQUALS;
     }
 
     protected void createGridColumns() {

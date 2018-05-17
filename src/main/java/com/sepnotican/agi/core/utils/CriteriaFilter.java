@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 public class CriteriaFilter {
     private String fieldName;
-    private String fieldValue;
+    private Object fieldValue;
     private CompareType compateType;
 }

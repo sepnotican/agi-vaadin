@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaContext;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -32,28 +34,31 @@ public class GenericCriteriaFetcher<T> {
         buildPredicate(criteriaBuilder, root, query, filterSet);
 
         List<T> resultList = entityManagerByManagedType.createQuery(query).getResultList();
-        for (Object student : resultList) {
-            log.warn(student.toString());
-        }
+
         return resultList;
     }
 
     private void buildPredicate(CriteriaBuilder builder, Root<T> root, CriteriaQuery<T> query, Set<CriteriaFilter> filterSet) {
 
+        List<Predicate> predicates = new ArrayList<>();
+
         for (CriteriaFilter filter : filterSet) {
-            if (filter.getFieldValue() == null || filter.getFieldValue().isEmpty()) continue;
+            if (filter.getFieldValue() == null ||
+                    (filter.getFieldValue() instanceof String
+                            && ((String) filter.getFieldValue()).isEmpty())) continue;
 
             if (filter.getCompateType() == CompareType.EQUALS) {
-                query.where(builder.equal(root.get(filter.getFieldName()), filter.getFieldValue()));
+                predicates.add(builder.equal(root.get(filter.getFieldName()), filter.getFieldValue()));
             } else if (filter.getCompateType() == CompareType.NOT_EQUALS) {
-                query.where(builder.notEqual(root.get(filter.getFieldName()), filter.getFieldValue()));
+                predicates.add((builder.notEqual(root.get(filter.getFieldName()), filter.getFieldValue())));
             } else if (filter.getCompateType() == CompareType.LIKE) {
-                query.where(builder.like(root.get(filter.getFieldName()), "%" + filter.getFieldValue() + "%"));
+                predicates.add((builder.like(root.get(filter.getFieldName()), "%" + filter.getFieldValue() + "%")));
             } else if (filter.getCompateType() == CompareType.STARTS_WITH) {
-                query.where(builder.like(root.get(filter.getFieldName()), filter.getFieldValue() + "%"));
+                predicates.add((builder.like(root.get(filter.getFieldName()), filter.getFieldValue() + "%")));
             }
         }
 
+        query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
 
     }
 }
