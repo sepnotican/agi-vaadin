@@ -11,6 +11,7 @@ import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import lombok.extern.slf4j.Slf4j;
@@ -131,5 +132,11 @@ public class GenericFieldGenerator {
         if (field.isAnnotationPresent(Synonym.class)) {
             component.setCaption(field.getAnnotation(Synonym.class).value());
         } else component.setCaption(field.getName());
+    }
+
+    protected void makeUpCaptionForField(Field field, Grid.Column column) {
+        if (field.isAnnotationPresent(Synonym.class)) {
+            column.setCaption(field.getAnnotation(Synonym.class).value());
+        } else column.setCaption(field.getName());
     }
 }

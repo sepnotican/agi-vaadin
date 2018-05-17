@@ -5,13 +5,12 @@ import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.CompareType;
 import com.sepnotican.agi.core.utils.CriteriaFilter;
-import com.sepnotican.agi.core.utils.GenericCriteriaFetcherFactory;
+import com.sepnotican.agi.core.utils.GenericRepositoryFactory;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.provider.Query;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -34,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -50,20 +50,19 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     protected String OPEN_TEXT;
     @Value("${agi.forms.list.delete}")
     protected String DELETE_TEXT;
+    @Autowired
+    GenericFieldGenerator genericFieldGenerator;
+    @Autowired
+    private GenericRepositoryFactory genericRepositoryFactory;
+
     protected IFormHandler formHandler;
     protected R repository;
     protected Grid<T> grid;
     protected Class<T> aClass;
     protected HorizontalLayout filterLayout;
-
     protected Set<CriteriaFilter> filterSet = new HashSet<>();
-
-    @Autowired
-    GenericFieldGenerator fieldGenerator;
     protected DataProvider<T, Set<CriteriaFilter>> gridDataProvider;
     protected ConfigurableFilterDataProvider<T, Void, Set<CriteriaFilter>> wrapper;
-    @Autowired
-    private GenericCriteriaFetcherFactory repositoryFactory;
 
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
@@ -81,22 +80,20 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         createGrid();
     }
 
+    @SuppressWarnings("unchecked")
     private void initializeGridDataProvider() {
         gridDataProvider = DataProvider.fromFilteringCallbacks(
-                new CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>() {
-                    @Override
-                    public Stream<T> fetch(Query<T, Set<CriteriaFilter>> query) {
-                        if (filterSet.size() > 0)
-                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(filterSet).stream();
-                        else
-                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).stream();
-                    }
+                (CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>) query -> {
+                    if (filterSet.size() > 0)
+                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).stream();
+                    else
+                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(ImmutableSet.of()).stream();
                 },
                 query -> {
                     if (filterSet.size() > 0)
-                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(filterSet).size();
+                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).size();
                     else
-                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).size();
+                        return genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(ImmutableSet.of()).size();
                 }
         );
         wrapper = gridDataProvider.withConfigurableFilter();
@@ -121,24 +118,17 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         addComponentsAndExpand(grid);
     }
 
+    @SuppressWarnings("unchecked")
     protected void createFilers() {
         for (Field field : aClass.getDeclaredFields()) {
-            com.vaadin.ui.Component componentByField = fieldGenerator.getComponentByField(field);
-
+            com.vaadin.ui.Component componentByField = genericFieldGenerator.getComponentByField(field);
             if (componentByField == null) continue;
-
-            ((HasValue) componentByField).addValueChangeListener(new HasValue.ValueChangeListener() {
-                @Override
-                public void valueChange(HasValue.ValueChangeEvent event) {
-                    CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue(), getFieldCompareType(field));
-
-                    filterSet.remove(criteriaFilter);
-                    filterSet.add(criteriaFilter);
-                    log.warn(criteriaFilter.toString());
-                    wrapper.setFilter(filterSet);
-                }
+            ((HasValue) componentByField).addValueChangeListener((HasValue.ValueChangeListener) event -> {
+                CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue(), getFieldCompareType(field));
+                filterSet.remove(criteriaFilter);
+                filterSet.add(criteriaFilter);
+                wrapper.setFilter(filterSet);
             });
-
             filterLayout.addComponent(componentByField);
         }
     }
@@ -152,48 +142,49 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
         grid.removeAllColumns();
         for (Field field : aClass.getDeclaredFields()) {
             if (isNotIgnoredType(field.getType())) {
+                Grid.Column<T, ?> tColumn;
                 if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
-                    buildFieldRepresentationResolver(field);
+                    tColumn = createColumnWithRepresentationResolver(field);
                 } else {
-                    grid.addColumn(field.getName());
+                    tColumn = grid.addColumn(field.getName());
                 }
+                genericFieldGenerator.makeUpCaptionForField(field, tColumn);
             }
         }
     }
 
-    protected void buildFieldRepresentationResolver(Field field) {
+    protected Grid.Column<T, ?> createColumnWithRepresentationResolver(Field field) {
         String methodQualifier = field.getType().getAnnotation(RepresentationResolver.class).value();
         for (Method method : field.getType().getDeclaredMethods()) {
             if (method.isAnnotationPresent(RepresentationResolver.class) &&
                     method.getAnnotation(RepresentationResolver.class).value().equals(methodQualifier)) {
-                Grid.Column<T, String> column = grid.addColumn(new ValueProvider<T, String>() {
-                    @Override
-                    public String apply(T t) {
-                        try {
-                            Object classMember;
-                            if (!field.isAccessible()) {
-                                field.setAccessible(true);
-                                classMember = field.get(t);
-                                field.setAccessible(false);
-                            } else classMember = field.get(t);
-                            if (classMember != null) return (String) method.invoke(classMember);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            log.error(e.getMessage());
-                        }
-                        return null;
+                Grid.Column<T, String> column = grid.addColumn((ValueProvider<T, String>) t -> {
+                    try {
+                        Object classMember;
+                        if (!field.isAccessible()) {
+                            field.setAccessible(true);
+                            classMember = field.get(t);
+                            field.setAccessible(false);
+                        } else classMember = field.get(t);
+                        if (classMember != null) return (String) method.invoke(classMember);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        log.error(e.getMessage());
                     }
+                    return null;
                 });
-                column.setCaption(field.getType().getSimpleName());
                 column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
                 column.setSortable(true);
-                break;
+                return column;
             }
         }
+        log.error("Not found a RepresentationResolver method with qualifier={}", methodQualifier);
+        throw new RuntimeException("RepresentationResolver not found!");
     }
 
     protected boolean isNotIgnoredType(Class<?> type) {
         return !type.isAssignableFrom(Set.class)
-                && !type.isAssignableFrom(Map.class);
+                && !type.isAssignableFrom(Map.class)
+                && !type.isAssignableFrom(List.class);
     }
 
     protected void createCommandPanel() {
