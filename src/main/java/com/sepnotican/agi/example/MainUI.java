@@ -1,6 +1,11 @@
 package com.sepnotican.agi.example;
 
+import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.form.IUIHandler;
+import com.sepnotican.agi.core.utils.CompareType;
+import com.sepnotican.agi.core.utils.CriteriaFilter;
+import com.sepnotican.agi.core.utils.GenericCriteriaFetcher;
+import com.sepnotican.agi.core.utils.GenericCriteriaFetcherFactory;
 import com.sepnotican.agi.example.entity.Customer;
 import com.sepnotican.agi.example.entity.TradeDeal;
 import com.sepnotican.agi.example.repository.CustomerRepo;
@@ -24,9 +29,8 @@ public class MainUI extends UI {
     private IUIHandler uiHandler;
     @Autowired
     private ApplicationContext context;
-
     @Autowired
-    CustomerService customerService;
+    private GenericCriteriaFetcherFactory repositoryFactory;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -37,11 +41,12 @@ public class MainUI extends UI {
 
         Button btnPopulateDB = new Button("Populate DB");
         btnPopulateDB.addClickListener(getClickListener());
-        uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
+        //uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
 
+        GenericCriteriaFetcher rep = repositoryFactory.createCriteriaRepository(Customer.class);
         Button btnTest = new Button("test");
-        btnTest.addClickListener(e -> customerService.getCustomersByCriteria("%a%"));
-        uiHandler.getMainFormHandler().addComponent(btnTest, 0);
+        btnTest.addClickListener(e -> rep.getByCriteria(ImmutableSet.of(new CriteriaFilter("name", "a", CompareType.LIKE))));
+        //uiHandler.getMainFormHandler().addComponent(btnTest, 0);
     }
 
     private Button.ClickListener getClickListener() {

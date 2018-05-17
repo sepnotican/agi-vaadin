@@ -32,7 +32,7 @@ import java.util.Set;
 @RepresentationResolver("fullname")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "tradeDeals")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {

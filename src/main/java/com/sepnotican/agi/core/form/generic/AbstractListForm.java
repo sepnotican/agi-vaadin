@@ -1,7 +1,11 @@
 package com.sepnotican.agi.core.form.generic;
 
+import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
+import com.sepnotican.agi.core.utils.CompareType;
+import com.sepnotican.agi.core.utils.CriteriaFilter;
+import com.sepnotican.agi.core.utils.GenericCriteriaFetcherFactory;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.CallbackDataProvider;
@@ -29,6 +33,7 @@ import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -50,12 +55,15 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     protected Grid<T> grid;
     protected Class<T> aClass;
     protected HorizontalLayout filterLayout;
+
+    protected Set<CriteriaFilter> filterSet = new HashSet<>();
+
     @Autowired
     GenericFieldGenerator fieldGenerator;
-
-    protected DataProvider<T, String> gridDataProvider;
-    protected ConfigurableFilterDataProvider<T, Void, String> wrapper;
-    protected EntityDataService<T> entityDataService;
+    protected DataProvider<T, CriteriaFilter> gridDataProvider;
+    protected ConfigurableFilterDataProvider<T, Void, CriteriaFilter> wrapper;
+    @Autowired
+    private GenericCriteriaFetcherFactory repositoryFactory;
 
     public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
         this.formHandler = formHandler;
@@ -74,20 +82,24 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     }
 
     private void initializeGridDataProvider() {
-        entityDataService = new EntityDataService<>(repository);
-//        gridDataProvider = new RepositoryDataProvider<T, String>(repository);
         gridDataProvider = DataProvider.fromFilteringCallbacks(
-                new CallbackDataProvider.FetchCallback<T, String>() {
+                new CallbackDataProvider.FetchCallback<T, CriteriaFilter>() {
                     @Override
-                    public Stream<T> fetch(Query<T, String> query) {
-                        // getFilter returns Optional<String>
-                        String filter = query.getFilter().orElse("");
-                        //return entityDataService.getItems(query.getOffset(), query.getLimit(), query.getSortOrders(), filter);
-                        return repository.findAll().stream();
+                    public Stream<T> fetch(Query<T, CriteriaFilter> query) {
+                        CriteriaFilter criteriaFilter = query.getFilter().orElse(null);
+                        if (criteriaFilter != null)
+                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of(criteriaFilter)).stream();
+                        else
+                            return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).stream();
                     }
                 },
-//                query -> entityDataService.count()
-                query -> (int) repository.count()
+                query -> {
+                    CriteriaFilter criteriaFilter = query.getFilter().orElse(null);
+                    if (criteriaFilter != null)
+                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of(criteriaFilter)).size();
+                    else
+                        return repositoryFactory.createCriteriaRepository(aClass).getByCriteria(ImmutableSet.of()).size();
+                }
         );
         wrapper = gridDataProvider.withConfigurableFilter();
     }
@@ -120,10 +132,9 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             ((HasValue) componentByField).addValueChangeListener(new HasValue.ValueChangeListener() {
                 @Override
                 public void valueChange(HasValue.ValueChangeEvent event) {
-
-                    wrapper.setFilter(event.getValue().toString());
-//                    grid.setDataProvider(wrapper);
-                    log.warn(((HasValue) componentByField).getValue().toString());
+                    CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue().toString(), CompareType.STARTS_WITH);
+                    wrapper.setFilter(criteriaFilter);
+                    log.info(criteriaFilter.toString());
                 }
             });
 
