@@ -25,6 +25,9 @@ public class MainUI extends UI {
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    CustomerService customerService;
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
@@ -35,6 +38,10 @@ public class MainUI extends UI {
         Button btnPopulateDB = new Button("Populate DB");
         btnPopulateDB.addClickListener(getClickListener());
         //uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
+
+        Button btnTest = new Button("test");
+        btnTest.addClickListener(e -> customerService.getCustomersByCriteria("%a%"));
+        uiHandler.getMainFormHandler().addComponent(btnTest);
     }
 
     private Button.ClickListener getClickListener() {
