@@ -37,23 +37,23 @@ public class MainUI extends UI {
 
         Button btnPopulateDB = new Button("Populate DB");
         btnPopulateDB.addClickListener(getClickListener());
-        //uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
+        uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
 
         Button btnTest = new Button("test");
         btnTest.addClickListener(e -> customerService.getCustomersByCriteria("%a%"));
-        uiHandler.getMainFormHandler().addComponent(btnTest);
+        uiHandler.getMainFormHandler().addComponent(btnTest, 0);
     }
 
     private Button.ClickListener getClickListener() {
         return (e) -> {
 
 
-            Customer c1 = new Customer("Vasiliy", "descrip ion", EnumColor.BLACK, null);
-            Customer c2 = new Customer("Semen", "descrip ion", EnumColor.GREEN, null);
-            Customer c3 = new Customer("Pavel petrovi4", "descrip ion", EnumColor.RED, null);
-            Customer c4 = new Customer("Dudka", "descrip ion", EnumColor.WHITE, null);
-            Customer c5 = new Customer("Utka", "descrip ion", EnumColor.BLUE, null);
-            Customer c6 = new Customer("Putka", "descrip ion", EnumColor.BLACK, null);
+            Customer c1 = new Customer(null, "Vasiliy", "descrip ion", EnumColor.BLACK, null);
+            Customer c2 = new Customer(null, "Semen", "descrip ion", EnumColor.GREEN, null);
+            Customer c3 = new Customer(null, "Pavel petrovi4", "descrip ion", EnumColor.RED, null);
+            Customer c4 = new Customer(null, "Dudka", "descrip ion", EnumColor.WHITE, null);
+            Customer c5 = new Customer(null, "Utka", "descrip ion", EnumColor.BLUE, null);
+            Customer c6 = new Customer(null, "Putka", "descrip ion", EnumColor.BLACK, null);
 
             Set<TradeDeal> dealSet1 = new HashSet<>();
             dealSet1.add(new TradeDeal(1000d, c1));

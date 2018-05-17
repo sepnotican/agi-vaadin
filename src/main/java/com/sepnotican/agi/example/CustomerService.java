@@ -29,7 +29,7 @@ public class CustomerService {
 
         List<Customer> resultList = entityManagerByManagedType.createQuery(query).getResultList();
         for (Customer student : resultList) {
-            log.warn("id:" + student.getId() + ", age:" + student.getColor());
+            log.warn(student.toString());
         }
         return null;
     }

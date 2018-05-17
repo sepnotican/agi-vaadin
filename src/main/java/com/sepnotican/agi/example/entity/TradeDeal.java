@@ -4,8 +4,16 @@ import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.example.repository.TradeDealsRepo;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "trade_deals")
@@ -13,6 +21,8 @@ import javax.persistence.*;
         entityCaption = "Trade deal",
         repo = TradeDealsRepo.class,
         idFieldName = "id")
+@Data
+@NoArgsConstructor
 public class TradeDeal {
 
     @Column
@@ -27,45 +37,10 @@ public class TradeDeal {
     @GeneratedValue
     private Long id;
 
-    public TradeDeal() {
-    }
-
     public TradeDeal(double sum, Customer customer) {
 
         this.sum = sum;
         this.customer = customer;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public double getSum() {
-        return sum;
-    }
-
-    public void setSum(double sum) {
-        this.sum = sum;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    @Override
-    public String toString() {
-        return "TradeDeal{" +
-                "id=" + id +
-                ", C=" + customer +
-                ", $=" + sum +
-                '}';
-    }
 }
