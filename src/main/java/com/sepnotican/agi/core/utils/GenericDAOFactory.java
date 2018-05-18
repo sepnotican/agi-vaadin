@@ -9,17 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class GenericRepositoryFactory {
+public class GenericDAOFactory {
     @Autowired
     private JpaContext jpaContext;
     @Getter
-    private final Map<Class, GenericRepository> cache = new HashMap<>();
+    private final Map<Class, GenericDAO> cache = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public GenericRepository getRepositoryForClass(Class aClass) {
-        GenericRepository foundedRepository = cache.get(aClass);
+    public GenericDAO getRepositoryForClass(Class aClass) {
+        GenericDAO foundedRepository = cache.get(aClass);
         if (foundedRepository == null) {
-            GenericRepository repository = new GenericRepository(aClass, jpaContext);
+            GenericDAO repository = new GenericDAO(aClass, jpaContext);
             cache.put(aClass, repository);
             return repository;
         } else return foundedRepository;

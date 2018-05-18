@@ -4,7 +4,8 @@ import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.core.utils.RepositoryDataProvider;
+import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
+import com.sepnotican.agi.core.utils.GenericDAOFactory;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;
@@ -30,6 +31,8 @@ public class GenericFieldGenerator {
     protected String EMPTY_ENUM_TEXT;
     @Autowired
     private ApplicationContext context;
+    @Autowired
+    private GenericDAOFactory genericDAOFactory;
 
     protected com.vaadin.ui.Component getComponentByField(Field field) {
         com.vaadin.ui.Component component;
@@ -55,6 +58,7 @@ public class GenericFieldGenerator {
         return component;
     }
 
+    @SuppressWarnings("unchecked")
     protected com.vaadin.ui.Component getComponentByFieldAndBind(Field field, Binder binder) {
         com.vaadin.ui.Component component = getComponentByField(field);
         if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
@@ -107,6 +111,7 @@ public class GenericFieldGenerator {
         return new TextField(field.getName());
     }
 
+    @SuppressWarnings("unchecked")
     protected com.vaadin.ui.Component generateLinkedObjectField(Field field) {
         if (!field.getType().isAnnotationPresent(AgiUI.class)) {
             log.error("Attempt to create field without AgiUI annotation. " +
@@ -123,7 +128,8 @@ public class GenericFieldGenerator {
             comboBox.setCaption(field.getName());
         }
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        comboBox.setDataProvider(new RepositoryDataProvider<>(repository));
+        comboBox.setDataProvider(new GenericBackendDataProvider(field.getType(),
+                genericDAOFactory.getRepositoryForClass(field.getType())));
 
         return comboBox;
     }

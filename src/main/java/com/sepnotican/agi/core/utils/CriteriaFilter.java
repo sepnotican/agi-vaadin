@@ -7,10 +7,11 @@ import lombok.ToString;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(of = "fieldName")
+@EqualsAndHashCode(of = {"targetClass", "fieldName"})
 @ToString
 public class CriteriaFilter {
+    private Class targetClass;
     private String fieldName;
     private Object fieldValue;
-    private CompareType compateType;
+    private CompareType compareType;
 }

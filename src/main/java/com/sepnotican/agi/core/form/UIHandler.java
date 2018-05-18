@@ -3,12 +3,16 @@ package com.sepnotican.agi.core.form;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @Component
 public class UIHandler implements IUIHandler {
+
+    @Value("${agi.forms.main.title}")
+    String mainPageTitle;
 
     @Autowired
     MainMenuGenerator mainMenuGenerator;
@@ -23,7 +27,7 @@ public class UIHandler implements IUIHandler {
     @PostConstruct
     public void init() {
         mainFormHandler.getMainLayout().
-                addComponent(new Label("Auto Generated Interface for Vaadin - example"), 0);
+                addComponent(new Label(mainPageTitle), 0);
     }
 
     @Override

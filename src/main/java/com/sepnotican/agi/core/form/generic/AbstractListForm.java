@@ -4,10 +4,10 @@ import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.CompareType;
 import com.sepnotican.agi.core.utils.CriteriaFilter;
-import com.sepnotican.agi.core.utils.GenericRepositoryFactory;
+import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
+import com.sepnotican.agi.core.utils.GenericDAOFactory;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
-import com.vaadin.data.provider.CallbackDataProvider;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.QuerySortOrder;
@@ -52,7 +52,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     @Autowired
     GenericFieldGenerator genericFieldGenerator;
     @Autowired
-    private GenericRepositoryFactory genericRepositoryFactory;
+    private GenericDAOFactory genericDAOFactory;
 
     protected IFormHandler formHandler;
     protected R repository;
@@ -81,10 +81,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @SuppressWarnings("unchecked")
     private void initializeGridDataProvider() {
-        gridDataProvider = DataProvider.fromFilteringCallbacks((CallbackDataProvider.FetchCallback<T, Set<CriteriaFilter>>)
-                        query -> genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).stream(),
-                query -> genericRepositoryFactory.getRepositoryForClass(aClass).getByCriteriaFilterSet(filterSet).size()
-        );
+        gridDataProvider = new GenericBackendDataProvider<T>(aClass, genericDAOFactory.getRepositoryForClass(aClass));
 
         wrapper = gridDataProvider.withConfigurableFilter();
     }
@@ -114,7 +111,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
             com.vaadin.ui.Component componentByField = genericFieldGenerator.getComponentByField(field);
             if (componentByField == null) continue;
             ((HasValue) componentByField).addValueChangeListener((HasValue.ValueChangeListener) event -> {
-                CriteriaFilter criteriaFilter = new CriteriaFilter(field.getName(), event.getValue(), getFieldCompareType(field));
+                CriteriaFilter criteriaFilter = new CriteriaFilter(field.getType(), field.getName(),
+                        event.getValue(), getFieldCompareType(field));
                 filterSet.remove(criteriaFilter);
                 filterSet.add(criteriaFilter);
                 wrapper.setFilter(filterSet);

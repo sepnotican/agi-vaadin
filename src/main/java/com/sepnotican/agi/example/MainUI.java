@@ -1,11 +1,6 @@
 package com.sepnotican.agi.example;
 
-import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.form.IUIHandler;
-import com.sepnotican.agi.core.utils.CompareType;
-import com.sepnotican.agi.core.utils.CriteriaFilter;
-import com.sepnotican.agi.core.utils.GenericRepository;
-import com.sepnotican.agi.core.utils.GenericRepositoryFactory;
 import com.sepnotican.agi.example.entity.Customer;
 import com.sepnotican.agi.example.entity.TradeDeal;
 import com.sepnotican.agi.example.repository.CustomerRepo;
@@ -29,8 +24,6 @@ public class MainUI extends UI {
     private IUIHandler uiHandler;
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private GenericRepositoryFactory repositoryFactory;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -43,10 +36,6 @@ public class MainUI extends UI {
         btnPopulateDB.addClickListener(getClickListener());
         //uiHandler.getMainFormHandler().getMainLayout().addComponent(btnPopulateDB, 0);
 
-        GenericRepository rep = repositoryFactory.getRepositoryForClass(Customer.class);
-        Button btnTest = new Button("test");
-        btnTest.addClickListener(e -> rep.getByCriteriaFilterSet(ImmutableSet.of(new CriteriaFilter("name", "a", CompareType.LIKE))));
-        //uiHandler.getMainFormHandler().addComponent(btnTest, 0);
     }
 
     private Button.ClickListener getClickListener() {

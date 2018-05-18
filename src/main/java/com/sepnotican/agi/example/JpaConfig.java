@@ -74,13 +74,6 @@ public class JpaConfig {
                 env.getRequiredProperty("hibernate.connection.useUnicode")
         );
 
-        jpaProperties.put("hibernate.search.default.directory_provider",
-                env.getRequiredProperty("hibernate.search.default.directory_provider")
-        );
-        jpaProperties.put("hibernate.search.default.indexBase",
-                env.getRequiredProperty("hibernate.search.default.indexBase")
-        );
-
         entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
         return entityManagerFactoryBean;
