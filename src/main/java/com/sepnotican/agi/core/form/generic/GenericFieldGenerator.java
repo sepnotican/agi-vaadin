@@ -5,7 +5,7 @@ import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDAOFactory;
+import com.sepnotican.agi.core.utils.GenericDao;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;
@@ -31,8 +31,6 @@ public class GenericFieldGenerator {
     protected String EMPTY_ENUM_TEXT;
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private GenericDAOFactory genericDAOFactory;
 
     protected com.vaadin.ui.Component getComponentByField(Field field) {
         com.vaadin.ui.Component component;
@@ -129,7 +127,7 @@ public class GenericFieldGenerator {
         }
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
         comboBox.setDataProvider(new GenericBackendDataProvider(field.getType(),
-                genericDAOFactory.getRepositoryForClass(field.getType())));
+                context.getBean(GenericDao.class, field.getType())));
 
         return comboBox;
     }

@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 public class GenericBackendDataProvider<T> extends AbstractBackEndDataProvider {
 
     Class<T> aClass;
-    GenericDAO genericDAO;
+    GenericDao genericDao;
 
-    public GenericBackendDataProvider(Class<T> aClass, GenericDAO genericDAO) {
+    public GenericBackendDataProvider(Class<T> aClass, GenericDao genericDao) {
         this.aClass = aClass;
-        this.genericDAO = genericDAO;
+        this.genericDao = genericDao;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class GenericBackendDataProvider<T> extends AbstractBackEndDataProvider {
     }
 
     protected List<T> fetchFromBackEndList(Query query) {
-        return genericDAO.getEntitiesByCriteriaFilterSet(
+        return genericDao.getEntitiesByCriteriaFilterSet(
                 (Set<CriteriaFilter>) query.getFilter().orElse(ImmutableSet.of()),
                 query.getSortOrders(),
                 query.getOffset(),
@@ -34,7 +34,7 @@ public class GenericBackendDataProvider<T> extends AbstractBackEndDataProvider {
 
     @Override
     protected int sizeInBackEnd(Query query) {
-        return Math.toIntExact(genericDAO.getCountByCriteriaFilterSet(
+        return Math.toIntExact(genericDao.getCountByCriteriaFilterSet(
                 (Set<CriteriaFilter>) query.getFilter().orElse(ImmutableSet.of())));
     }
 }

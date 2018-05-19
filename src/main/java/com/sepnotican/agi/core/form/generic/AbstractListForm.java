@@ -5,7 +5,7 @@ import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.CompareType;
 import com.sepnotican.agi.core.utils.CriteriaFilter;
 import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDAOFactory;
+import com.sepnotican.agi.core.utils.GenericDao;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
@@ -23,6 +23,7 @@ import com.vaadin.ui.Window;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     @Autowired
     GenericFieldGenerator genericFieldGenerator;
     @Autowired
-    private GenericDAOFactory genericDAOFactory;
+    ApplicationContext context;
 
     protected IFormHandler formHandler;
     protected R repository;
@@ -81,7 +82,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @SuppressWarnings("unchecked")
     private void initializeGridDataProvider() {
-        gridDataProvider = new GenericBackendDataProvider<T>(aClass, genericDAOFactory.getRepositoryForClass(aClass));
+        gridDataProvider = new GenericBackendDataProvider<T>(aClass, context.getBean(GenericDao.class, aClass));
 
         wrapper = gridDataProvider.withConfigurableFilter();
     }

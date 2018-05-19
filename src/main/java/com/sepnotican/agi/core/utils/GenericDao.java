@@ -3,8 +3,12 @@ package com.sepnotican.agi.core.utils;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.shared.data.sort.SortDirection;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.JpaContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -19,19 +23,32 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public class GenericDAO<T> {
+@Component
+@Scope("prototype")
+public class GenericDao<T> {
 
-    private Class<T> entityClass;
-    private JpaContext jpaContext;
+    public static volatile int q, w;
+    @Autowired
+    protected EntityManager entityManager;
+    protected Class<T> entityClass;
 
-    public GenericDAO(Class<T> entityClass, JpaContext jpaContext) {
+    public GenericDao(Class<T> entityClass) {
         this.entityClass = entityClass;
-        this.jpaContext = jpaContext;
+    }
+
+    @PostConstruct
+    void pc() {
+        q++;
+    }
+
+    @Override
+    protected void finalize() {
+        w++;
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true)
     public List<T> getEntitiesByCriteriaFilterSet(Set<CriteriaFilter> filterSet, List<QuerySortOrder> sortOrders, int offset, int limit) {
-        EntityManager entityManager = jpaContext.getEntityManagerByManagedType(entityClass);
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery query = builder.createQuery();
         Root<T> root = query.from(entityClass);
@@ -43,8 +60,8 @@ public class GenericDAO<T> {
         return (List<T>) typedQuery.getResultList();
     }
 
+    @Transactional(readOnly = true)
     public Long getCountByCriteriaFilterSet(Set<CriteriaFilter> filterSet) {
-        EntityManager entityManager = jpaContext.getEntityManagerByManagedType(entityClass);
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery query = builder.createQuery();
         Root<T> root = query.from(entityClass);
@@ -54,12 +71,20 @@ public class GenericDAO<T> {
         return (Long) typedQuery.getSingleResult();
     }
 
-    private void buildLimit(TypedQuery typedQuery, int offset, int limit) {
+    @Transactional
+    public T save(T entity) {
+        T mergedEntity = entityManager.merge(entity);
+        entityManager.flush();
+        entityManager.refresh(mergedEntity);
+        return mergedEntity;
+    }
+
+    protected void buildLimit(TypedQuery typedQuery, int offset, int limit) {
         typedQuery.setFirstResult(offset);
         typedQuery.setMaxResults(limit);
     }
 
-    private void buildSortOrders(CriteriaBuilder builder, Root<T> root, CriteriaQuery query, List<QuerySortOrder> sortOrders) {
+    protected void buildSortOrders(CriteriaBuilder builder, Root<T> root, CriteriaQuery query, List<QuerySortOrder> sortOrders) {
         List<Order> orderList = new LinkedList<>();
         for (QuerySortOrder vaadinOrder : sortOrders) {
             Path<Object> objectPath = root.get(vaadinOrder.getSorted());
