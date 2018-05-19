@@ -1,5 +1,6 @@
 package com.sepnotican.agi.example;
 
+import com.sepnotican.agi.core.SessionUIHolder;
 import com.sepnotican.agi.core.form.IUIHandler;
 import com.sepnotican.agi.example.entity.Customer;
 import com.sepnotican.agi.example.entity.TradeDeal;
@@ -21,14 +22,20 @@ import java.util.Set;
 public class MainUI extends UI {
 
     @Autowired
-    private IUIHandler uiHandler;
-    @Autowired
     private ApplicationContext context;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
+        IUIHandler uiHandler = null;
+        String sessionId = vaadinRequest.getWrappedSession().getId();
+        uiHandler = SessionUIHolder.sessionsMap.get(sessionId);
+        if (uiHandler == null) {
+            uiHandler = context.getBean(IUIHandler.class);
+            SessionUIHolder.sessionsMap.put(vaadinRequest.getWrappedSession().getId(), uiHandler);
+        }
         setContent(uiHandler.getMainLayout());
+        //todo kill sess
         setSizeFull();
 
 
