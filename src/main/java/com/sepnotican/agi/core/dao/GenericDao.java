@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.utils;
+package com.sepnotican.agi.core.dao;
 
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.shared.data.sort.SortDirection;

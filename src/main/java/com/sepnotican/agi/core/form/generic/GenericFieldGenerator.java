@@ -4,11 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
+import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.core.utils.CompareType;
-import com.sepnotican.agi.core.utils.CriteriaFilter;
-import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDaoFactory;
+import com.sepnotican.agi.core.dao.CompareType;
+import com.sepnotican.agi.core.dao.CriteriaFilter;
+import com.sepnotican.agi.core.dao.GenericBackendDataProvider;
+import com.sepnotican.agi.core.dao.GenericDaoFactory;
+import com.sepnotican.agi.core.form.util.VaadinProvidersFactory;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;
@@ -101,7 +103,7 @@ public class GenericFieldGenerator {
     }
 
     protected com.vaadin.ui.Component generateStringField(Field field) {
-        com.vaadin.ui.Component textField = null;
+        com.vaadin.ui.Component textField;
         if (field.isAnnotationPresent(BigString.class)) {
             textField = new TextArea();
         } else textField = new TextField();
@@ -122,6 +124,8 @@ public class GenericFieldGenerator {
         }
         ComboBox comboBox = new ComboBox<>();
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
+        final String methodName = field.getType().getAnnotation(RepresentationResolver.class).value();
+        comboBox.setItemCaptionGenerator(VaadinProvidersFactory.getItemCaptionGenerator(field, methodName));
         comboBox.setDataProvider(new GenericBackendDataProvider(fieldType,
                 genericDaoFactory.getGenericDaoForClass(fieldType)).withConvertedFilter(new SerializableFunction() {
             @Override

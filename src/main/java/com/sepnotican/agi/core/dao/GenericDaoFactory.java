@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.utils;
+package com.sepnotican.agi.core.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

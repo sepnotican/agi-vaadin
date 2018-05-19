@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.utils;
+package com.sepnotican.agi.core.dao;
 
 public enum CompareType {
     EQUALS,

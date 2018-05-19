@@ -1,13 +1,13 @@
 package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
+import com.sepnotican.agi.core.dao.CompareType;
+import com.sepnotican.agi.core.dao.CriteriaFilter;
+import com.sepnotican.agi.core.dao.GenericBackendDataProvider;
+import com.sepnotican.agi.core.dao.GenericDaoFactory;
 import com.sepnotican.agi.core.form.IFormHandler;
-import com.sepnotican.agi.core.utils.CompareType;
-import com.sepnotican.agi.core.utils.CriteriaFilter;
-import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDaoFactory;
+import com.sepnotican.agi.core.form.util.VaadinProvidersFactory;
 import com.vaadin.data.HasValue;
-import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.QuerySortOrder;
@@ -28,8 +28,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -140,30 +138,10 @@ public class AbstractListForm<T> extends VerticalLayout {
 
     protected Grid.Column<T, ?> createColumnWithRepresentationResolver(Field field) {
         String methodQualifier = field.getType().getAnnotation(RepresentationResolver.class).value();
-        for (Method method : field.getType().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(RepresentationResolver.class) &&
-                    method.getAnnotation(RepresentationResolver.class).value().equals(methodQualifier)) {
-                Grid.Column<T, String> column = grid.addColumn((ValueProvider<T, String>) t -> {
-                    try {
-                        Object classMember;
-                        if (!field.isAccessible()) {
-                            field.setAccessible(true);
-                            classMember = field.get(t);
-                            field.setAccessible(false);
-                        } else classMember = field.get(t);
-                        if (classMember != null) return (String) method.invoke(classMember);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        log.error(e.getMessage());
-                    }
-                    return null;
-                });
-                column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
-                column.setSortable(true);
-                return column;
-            }
-        }
-        log.error("Not found a RepresentationResolver method with qualifier={}", methodQualifier);
-        throw new RuntimeException("RepresentationResolver not found!");
+        Grid.Column<T, String> column = grid.addColumn(VaadinProvidersFactory.getValueProvider(field, methodQualifier));
+        column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
+        column.setSortable(true);
+        return column;
     }
 
     protected boolean isNotIgnoredType(Class<?> type) {

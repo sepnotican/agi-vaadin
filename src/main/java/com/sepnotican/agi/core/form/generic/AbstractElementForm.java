@@ -1,9 +1,9 @@
 package com.sepnotican.agi.core.form.generic;
 
+import com.sepnotican.agi.core.dao.GenericDao;
+import com.sepnotican.agi.core.dao.GenericDaoFactory;
 import com.sepnotican.agi.core.form.IFormHandler;
-import com.sepnotican.agi.core.utils.GenericDao;
-import com.sepnotican.agi.core.utils.GenericDaoFactory;
-import com.sepnotican.agi.core.utils.UIOrderComparator;
+import com.sepnotican.agi.core.form.util.UIOrderComparator;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.icons.VaadinIcons;

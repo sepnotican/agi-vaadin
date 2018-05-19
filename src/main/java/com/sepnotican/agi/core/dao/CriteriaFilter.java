@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.utils;
+package com.sepnotican.agi.core.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

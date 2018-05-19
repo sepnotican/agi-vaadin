@@ -1,4 +1,4 @@
-package com.sepnotican.agi.core.utils;
+package com.sepnotican.agi.core.dao;
 
 import com.google.common.collect.ImmutableSet;
 import com.vaadin.data.provider.AbstractBackEndDataProvider;

@@ -1,6 +1,6 @@
 package com.sepnotican.agi;
 
-import com.sepnotican.agi.core.utils.GenericDao;
+import com.sepnotican.agi.core.dao.GenericDao;
 import com.sepnotican.agi.example.entity.Customer;
 import org.junit.Test;
 import org.junit.runner.RunWith;

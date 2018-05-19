@@ -3,8 +3,9 @@ package com.sepnotican.agi.example.entity;
 import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,13 +19,15 @@ import javax.persistence.Table;
 @Table(name = "trade_deals")
 @AgiUI(manyCaption = "Trade deals",
         singleCaption = "Trade deal", synonymField = "id")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class TradeDeal {
 
     @Column
     @Synonym("Summ of the deal")
     double sum;
+
     @LinkedObject
     @Synonym("Customer")
     @ManyToOne

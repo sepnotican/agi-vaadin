@@ -7,9 +7,9 @@ import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.example.EnumColor;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,9 +27,8 @@ import java.util.Set;
         singleCaption = "Customer",
         synonymField = "name")
 @RepresentationResolver("fullname")
-
-@Data
-@EqualsAndHashCode(exclude = "tradeDeals")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {

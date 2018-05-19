@@ -7,6 +7,7 @@ import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -14,17 +15,18 @@ import java.util.Comparator;
 import java.util.Set;
 
 @Component
+@Scope("prototype")
 public class MainMenuGenerator {
 
     @Value("${com.sepnotican.agi-package}")
     public String[] packagesToScan;
     @Autowired
     ApplicationContext context;
-    @Autowired
     private IFormHandler listFormHandler;
     private MenuBar menuBar = new MenuBar();
 
-    public MainMenuGenerator() {
+    public MainMenuGenerator(IFormHandler listFormHandler) {
+        this.listFormHandler = listFormHandler;
     }
 
     @PostConstruct
