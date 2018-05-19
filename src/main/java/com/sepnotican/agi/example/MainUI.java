@@ -8,6 +8,8 @@ import com.vaadin.ui.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import java.lang.ref.WeakReference;
+
 @SpringUI
 public class MainUI extends UI {
 
@@ -19,14 +21,19 @@ public class MainUI extends UI {
 
         IUIHandler uiHandler = null;
         String sessionId = vaadinRequest.getWrappedSession().getId();
-        uiHandler = SessionUIHolder.sessionsMap.get(sessionId);
+        WeakReference<IUIHandler> weakReference = SessionUIHolder.sessionsMap.get(sessionId);
+        if (weakReference != null) {
+            if (weakReference.get() == null) {
+                SessionUIHolder.removeSession(sessionId);
+            } else {
+                uiHandler = weakReference.get();
+            }
+        }
         if (uiHandler == null) {
             uiHandler = context.getBean(IUIHandler.class);
-            SessionUIHolder.sessionsMap.put(vaadinRequest.getWrappedSession().getId(), uiHandler);
+            SessionUIHolder.sessionsMap.put(vaadinRequest.getWrappedSession().getId(), new WeakReference<>(uiHandler));
         }
         setContent(uiHandler.getMainLayout());
-        //todo kill sess
         setSizeFull();
-
     }
 }
