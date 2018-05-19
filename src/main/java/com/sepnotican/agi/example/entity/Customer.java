@@ -2,10 +2,12 @@ package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
 import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiValueProvider;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.example.EnumColor;
+import com.vaadin.data.ValueProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +27,7 @@ import java.util.Set;
 @Table(name = "customer")
 @AgiUI(manyCaption = "Our Customers ",
         singleCaption = "Customer",
-        synonymField = "name")
+        fieldForInputSearch = "name")
 @RepresentationResolver("fullname")
 @Getter
 @Setter
@@ -54,9 +56,14 @@ public class Customer {
     @AgiDrawOrder(drawOrder = 5)
     private EnumColor color;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @AgiValueProvider("countOfTradeDeals")
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
+    @AgiValueProvider("countOfTradeDeals")
+    public ValueProvider countOfDeals() {
+        return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
+    }
 
     @RepresentationResolver("fullname")
     @Override

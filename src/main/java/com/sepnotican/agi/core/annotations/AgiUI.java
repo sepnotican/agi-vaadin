@@ -15,10 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface AgiUI {
-    String singleCaption();
+    String singleCaption() default "";
 
-    String manyCaption();
+    String manyCaption() default "";
     VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
 
-    String synonymField();
+    String fieldForInputSearch() default "";
 }

@@ -132,7 +132,7 @@ public class GenericFieldGenerator {
             @SneakyThrows
             public Object apply(Object o) {
                 if (o instanceof String) {
-                    final String synonymFieldName = fieldType.getAnnotation(AgiUI.class).synonymField();
+                    final String synonymFieldName = fieldType.getAnnotation(AgiUI.class).fieldForInputSearch();
                     Class<?> synonymFieldType = fieldType.getDeclaredField(synonymFieldName).getType();
                     CompareType compareType = synonymFieldType == String.class ? CompareType.LIKE : CompareType.EQUALS;
                     return ImmutableSet.of(new CriteriaFilter(fieldType, synonymFieldName, o.toString(), compareType));

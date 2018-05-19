@@ -1,5 +1,6 @@
 package com.sepnotican.agi.core.form.generic;
 
+import com.sepnotican.agi.core.annotations.AgiValueProvider;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.dao.CompareType;
 import com.sepnotican.agi.core.dao.CriteriaFilter;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -128,12 +128,22 @@ public class AbstractListForm<T> extends VerticalLayout {
                 Grid.Column<T, ?> tColumn;
                 if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
                     tColumn = createColumnWithRepresentationResolver(field);
+                } else if (field.isAnnotationPresent(AgiValueProvider.class)) {
+                    tColumn = createColumnWithAgiValueProvider(field);
                 } else {
                     tColumn = grid.addColumn(field.getName());
                 }
                 genericFieldGenerator.makeUpCaptionForField(field, tColumn);
             }
         }
+    }
+
+    private Grid.Column<T, ?> createColumnWithAgiValueProvider(Field field) {
+        String methodQualifier = field.getAnnotation(AgiValueProvider.class).value();
+        Grid.Column<T, String> column = grid.addColumn(VaadinProvidersFactory.getValueProvider(aClass, methodQualifier));
+        column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
+        column.setSortable(true);
+        return column;
     }
 
     protected Grid.Column<T, ?> createColumnWithRepresentationResolver(Field field) {
@@ -145,9 +155,7 @@ public class AbstractListForm<T> extends VerticalLayout {
     }
 
     protected boolean isNotIgnoredType(Class<?> type) {
-        return !type.isAssignableFrom(Set.class)
-                && !type.isAssignableFrom(Map.class)
-                && !type.isAssignableFrom(List.class);
+        return !type.isAssignableFrom(Map.class);
     }
 
     protected void createCommandPanel() {
