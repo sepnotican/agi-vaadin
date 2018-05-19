@@ -1,25 +1,28 @@
 package com.sepnotican.agi.core.form.generic;
 
+import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
+import com.sepnotican.agi.core.utils.CompareType;
+import com.sepnotican.agi.core.utils.CriteriaFilter;
 import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDao;
+import com.sepnotican.agi.core.utils.GenericDaoFactory;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
+import com.vaadin.server.SerializableFunction;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -27,10 +30,10 @@ import java.lang.reflect.Field;
 @Component
 @Slf4j
 public class GenericFieldGenerator {
-    @Value("${agi.forms.element.enum-null-selection}")
-    protected String EMPTY_ENUM_TEXT;
     @Autowired
-    private ApplicationContext context;
+    GenericDaoFactory genericDaoFactory;
+    @Value("${agi.forms.element.enum-null-selection}")
+    private String EMPTY_ENUM_TEXT;
 
     protected com.vaadin.ui.Component getComponentByField(Field field) {
         com.vaadin.ui.Component component;
@@ -111,24 +114,27 @@ public class GenericFieldGenerator {
 
     @SuppressWarnings("unchecked")
     protected com.vaadin.ui.Component generateLinkedObjectField(Field field) {
-        if (!field.getType().isAnnotationPresent(AgiUI.class)) {
-            log.error("Attempt to create field without AgiUI annotation. " +
-                    "Classname = " + field.getClass().getCanonicalName() +
-                    "Field name = " + field.getName());
+        final Class<?> fieldType = field.getType();
+        if (!fieldType.isAnnotationPresent(AgiUI.class)) {
+            log.error("Attempt to create field without AgiUI annotation. Classname = {} Field name = {}",
+                    field.getClass().getCanonicalName(), field.getName());
             return null;
         }
-        Class repositoryClass = field.getType().getAnnotation(AgiUI.class).repo();
-        JpaRepository repository = (JpaRepository) context.getBean(repositoryClass);
         ComboBox comboBox = new ComboBox<>();
-        if (field.isAnnotationPresent(Synonym.class)) {
-            comboBox.setCaption(field.getAnnotation(Synonym.class).value());
-        } else {
-            comboBox.setCaption(field.getName());
-        }
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        comboBox.setDataProvider(new GenericBackendDataProvider(field.getType(),
-                context.getBean(GenericDao.class, field.getType())));
-
+        comboBox.setDataProvider(new GenericBackendDataProvider(fieldType,
+                genericDaoFactory.getGenericDaoForClass(fieldType)).withConvertedFilter(new SerializableFunction() {
+            @Override
+            @SneakyThrows
+            public Object apply(Object o) {
+                if (o instanceof String) {
+                    final String synonymFieldName = fieldType.getAnnotation(AgiUI.class).synonymField();
+                    Class<?> synonymFieldType = fieldType.getDeclaredField(synonymFieldName).getType();
+                    CompareType compareType = synonymFieldType == String.class ? CompareType.LIKE : CompareType.EQUALS;
+                    return ImmutableSet.of(new CriteriaFilter(fieldType, synonymFieldName, o.toString(), compareType));
+                } else return o;
+            }
+        }));
         return comboBox;
     }
 

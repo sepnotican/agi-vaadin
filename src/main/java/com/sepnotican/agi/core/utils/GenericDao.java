@@ -116,4 +116,14 @@ public class GenericDao<T> {
         }
         query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
     }
+
+    @Transactional(readOnly = true)
+    public void refresh(T entity) {
+        entityManager.refresh(entityManager.merge(entity));
+    }
+
+    @Transactional
+    public void delete(T entity) {
+        entityManager.remove(entityManager.merge(entity));
+    }
 }

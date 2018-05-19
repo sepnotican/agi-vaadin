@@ -6,12 +6,10 @@ import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.example.EnumColor;
-import com.sepnotican.agi.example.repository.CustomerRepo;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,14 +23,13 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@AgiUI(listCaption = "Our Customers ",
-        entityCaption = "Customer",
-        repo = CustomerRepo.class,
-        idFieldName = "id")
+@AgiUI(manyCaption = "Our Customers ",
+        singleCaption = "Customer",
+        synonymField = "name")
 @RepresentationResolver("fullname")
-@Getter
-@Setter
-@ToString(exclude = "tradeDeals")
+
+@Data
+@EqualsAndHashCode(exclude = "tradeDeals")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
@@ -61,9 +58,11 @@ public class Customer {
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
+
     @RepresentationResolver("fullname")
-    public String getFullName() {
-        return this.id + ":" + this.name;
+    @Override
+    public String toString() {
+        return this.name + ':' + this.id;
     }
 
 }

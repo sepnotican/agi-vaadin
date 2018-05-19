@@ -5,7 +5,7 @@ import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.utils.CompareType;
 import com.sepnotican.agi.core.utils.CriteriaFilter;
 import com.sepnotican.agi.core.utils.GenericBackendDataProvider;
-import com.sepnotican.agi.core.utils.GenericDao;
+import com.sepnotican.agi.core.utils.GenericDaoFactory;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
@@ -23,9 +23,7 @@ import com.vaadin.ui.Window;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -42,7 +40,7 @@ import java.util.stream.Stream;
 @Component
 @Scope("prototype")
 @Slf4j
-public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout {
+public class AbstractListForm<T> extends VerticalLayout {
 
     @Value("${agi.forms.list.new}")
     protected String CREATE_TEXT;
@@ -53,10 +51,9 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     @Autowired
     GenericFieldGenerator genericFieldGenerator;
     @Autowired
-    ApplicationContext context;
+    GenericDaoFactory genericDaoFactory;
 
     protected IFormHandler formHandler;
-    protected R repository;
     protected Grid<T> grid;
     protected Class<T> aClass;
     protected HorizontalLayout filterLayout;
@@ -64,9 +61,8 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
     protected DataProvider<T, Set<CriteriaFilter>> gridDataProvider;
     protected ConfigurableFilterDataProvider<T, Void, Set<CriteriaFilter>> wrapper;
 
-    public AbstractListForm(IFormHandler formHandler, Class aClass, R repository) {
+    public AbstractListForm(IFormHandler formHandler, Class aClass) {
         this.formHandler = formHandler;
-        this.repository = repository;
         this.aClass = aClass;
         this.setHeightUndefined();
     }
@@ -82,7 +78,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     @SuppressWarnings("unchecked")
     private void initializeGridDataProvider() {
-        gridDataProvider = new GenericBackendDataProvider<T>(aClass, context.getBean(GenericDao.class, aClass));
+        gridDataProvider = new GenericBackendDataProvider<T>(aClass, genericDaoFactory.getGenericDaoForClass(aClass));
 
         wrapper = gridDataProvider.withConfigurableFilter();
     }
@@ -196,7 +192,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
                     VerticalLayout verticalLayout = new VerticalLayout();
                     verticalLayout.addComponent(label);
                     verticalLayout.addComponent(new Button("Yes", event1 -> {
-                        selectedItems.forEach(repository::delete);
+                        selectedItems.forEach(genericDaoFactory.getGenericDaoForClass(aClass)::delete);
                         this.grid.getDataProvider().refreshAll();
                         dialog.close();
                     }));
@@ -233,7 +229,7 @@ public class AbstractListForm<T, R extends JpaRepository> extends VerticalLayout
 
     protected void openAbstractElementForm(T item, boolean isNewInstance) {
         try {
-            formHandler.showAbstractElementForm(repository, item, isNewInstance);
+            formHandler.showAbstractElementForm(item, isNewInstance);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             handleError("Error is appeared while creating abstract element form", e);
         }

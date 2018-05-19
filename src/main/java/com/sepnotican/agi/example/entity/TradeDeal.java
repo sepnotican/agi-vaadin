@@ -3,7 +3,6 @@ package com.sepnotican.agi.example.entity;
 import com.sepnotican.agi.core.annotations.AgiUI;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.example.repository.TradeDealsRepo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,10 +16,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "trade_deals")
-@AgiUI(listCaption = "Trade deals",
-        entityCaption = "Trade deal",
-        repo = TradeDealsRepo.class,
-        idFieldName = "id")
+@AgiUI(manyCaption = "Trade deals",
+        singleCaption = "Trade deal", synonymField = "id")
 @Data
 @NoArgsConstructor
 public class TradeDeal {

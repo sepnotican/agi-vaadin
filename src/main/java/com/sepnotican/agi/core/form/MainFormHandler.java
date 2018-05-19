@@ -10,7 +10,6 @@ import com.vaadin.ui.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.Id;
@@ -67,15 +66,15 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         this.setExpandRatio(mainLayout, 1.0f);
     }
 
-    public <T> void showAbstractListForm(Class<T> aClass, JpaRepository<T, Object> jpaRepository) {
+    public <T> void showAbstractListForm(Class<T> aClass) {
         final String formCacheName = DEFAULT_LIST_FORM_PREFIX + aClass.getCanonicalName();
 
         TabSheet.Tab tab;
         tab = openedForms.get(formCacheName);
         if (tab == null) {
-            AbstractListForm<T, JpaRepository<T, Object>> listForm = context.getBean(AbstractListForm.class, this, aClass, jpaRepository);
+            AbstractListForm<T> listForm = context.getBean(AbstractListForm.class, this, aClass);
             tab = tabSheet.addTab(listForm);
-            tab.setCaption(aClass.getAnnotation(AgiUI.class).listCaption());
+            tab.setCaption(aClass.getAnnotation(AgiUI.class).manyCaption());
             tab.setIcon(aClass.getAnnotation(AgiUI.class).icon());
             tab.setVisible(true);
             tab.setClosable(true);
@@ -88,17 +87,16 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     }
 
     @Override
-    public <T> void showAbstractElementForm(JpaRepository<T, Object> jpaRepository
-            , T entity, boolean isNewInstance) throws NoSuchFieldException, IllegalAccessException {
+    public <T> void showAbstractElementForm(T entity, boolean isNewInstance) {
 
         AgiUI agiUI = entity.getClass().getAnnotation(AgiUI.class);
         if (agiUI == null) throw new RuntimeException("Expected annotation is not present");
-        final String formCacheName = generateElementCacheName(agiUI, entity);
+        final String formCacheName = generateElementCacheName(entity);
 
         TabSheet.Tab tab;
         tab = openedForms.get(formCacheName);
         if (tab == null) {
-            AbstractElementForm<T> elemForm = context.getBean(AbstractElementForm.class, this, jpaRepository);
+            AbstractElementForm<T> elemForm = context.getBean(AbstractElementForm.class, this);
             elemForm.init(entity, isNewInstance, formCacheName);
             tab = tabSheet.addTab(elemForm);
 
@@ -119,7 +117,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         if (!entity.getClass().isAnnotationPresent(AgiUI.class))
             throw new RuntimeException("Unacceptable class, annotation AgiUI is necessary");
 
-        String caption = entity.getClass().getAnnotation(AgiUI.class).entityCaption() + ':';
+        String caption = entity.getClass().getAnnotation(AgiUI.class).singleCaption() + ':';
         if (isNewInstance) {
             caption += "new";
         } else {
@@ -139,10 +137,10 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     }
 
     @Override
-    public <T> void refreshElementCaption(T entity, String cachedName) throws NoSuchFieldException, IllegalAccessException {
+    public <T> void refreshElementCaption(T entity, String cachedName) {
         AgiUI agiUI = entity.getClass().getAnnotation(AgiUI.class);
         if (agiUI == null) throw new RuntimeException("Expected annotation is absent");
-        final String newCachedName = generateElementCacheName(agiUI, entity);
+        final String newCachedName = generateElementCacheName(entity);
         TabSheet.Tab tab = openedForms.get(cachedName);
         if (tab == null) {
             log.warn("tab not found for cached name: " + cachedName);
@@ -154,12 +152,8 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
     }
 
-    protected <T> String generateElementCacheName(AgiUI agiUI, T entity) throws NoSuchFieldException, IllegalAccessException {
-        Field idField = entity.getClass().getDeclaredField(agiUI.idFieldName());
-        idField.setAccessible(true);
-        String nameAddition = String.valueOf(idField.get(entity));
-        idField.setAccessible(false);
-        return DEFAULT_ELEMENT_FORM_PREFIX + entity.getClass().getCanonicalName() + nameAddition;
+    protected <T> String generateElementCacheName(T entity) {
+        return DEFAULT_ELEMENT_FORM_PREFIX + entity.getClass().getCanonicalName() + entity.hashCode();
     }
 
 }
