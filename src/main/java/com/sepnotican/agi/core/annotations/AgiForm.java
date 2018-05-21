@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RepresentationResolver {
-    String value();
+public @interface AgiForm {
+    String caption();
 }

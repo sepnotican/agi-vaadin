@@ -2,7 +2,7 @@ package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,13 +26,14 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@AgiUI(manyCaption = "Our Customers ",
+@AgiEntity(manyCaption = "Our Customers ",
         singleCaption = "Customer",
         fieldForInputSearch = "name",
         menuPath = "/Trade")
-@RepresentationResolver("fullname")
+@RepresentationResolver("getFullName")
 @Getter
 @Setter
+@ToString(exclude = "tradeDeals")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
@@ -65,9 +67,7 @@ public class Customer {
         return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
     }
 
-    @RepresentationResolver("fullname")
-    @Override
-    public String toString() {
+    public String getFullName() {
         return this.name + ':' + this.id;
     }
 

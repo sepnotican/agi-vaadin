@@ -1,14 +1,14 @@
 package com.sepnotican.agi.core.form.util;
 
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EntityNamesResolver {
 
     public String getManyName(Class aClass) {
-        AgiUI agiUI = (AgiUI) aClass.getAnnotation(AgiUI.class);
-        return agiUI.manyCaption().isEmpty() ? aClass.getName() : agiUI.manyCaption();
+        AgiEntity agiEntity = (AgiEntity) aClass.getAnnotation(AgiEntity.class);
+        return agiEntity.manyCaption().isEmpty() ? aClass.getName() : agiEntity.manyCaption();
     }
 
 }

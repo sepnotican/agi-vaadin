@@ -1,6 +1,6 @@
 package com.sepnotican.agi.core.form;
 
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.form.generic.AbstractElementForm;
 import com.sepnotican.agi.core.form.generic.AbstractListForm;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -76,8 +76,8 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         if (tab == null) {
             AbstractListForm<T> listForm = context.getBean(AbstractListForm.class, this, aClass);
             tab = tabSheet.addTab(listForm);
-            tab.setCaption(aClass.getAnnotation(AgiUI.class).manyCaption());
-            tab.setIcon(aClass.getAnnotation(AgiUI.class).icon());
+            tab.setCaption(aClass.getAnnotation(AgiEntity.class).manyCaption());
+            tab.setIcon(aClass.getAnnotation(AgiEntity.class).icon());
             tab.setVisible(true);
             tab.setClosable(true);
             openedForms.put(formCacheName, tab);
@@ -91,8 +91,8 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     @Override
     public <T> void showAbstractElementForm(T entity, boolean isNewInstance) {
 
-        AgiUI agiUI = entity.getClass().getAnnotation(AgiUI.class);
-        if (agiUI == null) throw new RuntimeException("Expected annotation is not present");
+        AgiEntity agiEntity = entity.getClass().getAnnotation(AgiEntity.class);
+        if (agiEntity == null) throw new RuntimeException("Expected annotation is not present");
         final String formCacheName = generateElementCacheName(entity);
 
         TabSheet.Tab tab;
@@ -105,7 +105,7 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
             String caption = generateElementCaption(entity, isNewInstance);
 
             tab.setCaption(caption);
-            tab.setIcon(agiUI.icon());
+            tab.setIcon(agiEntity.icon());
             tab.setVisible(true);
             tab.setClosable(true);
             openedForms.put(formCacheName, tab);
@@ -116,10 +116,10 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
     }
 
     protected <T> String generateElementCaption(T entity, boolean isNewInstance) {
-        if (!entity.getClass().isAnnotationPresent(AgiUI.class))
-            throw new RuntimeException("Unacceptable class, annotation AgiUI is necessary");
+        if (!entity.getClass().isAnnotationPresent(AgiEntity.class))
+            throw new RuntimeException("Unacceptable class, annotation AgiEntity is necessary");
 
-        String caption = entity.getClass().getAnnotation(AgiUI.class).singleCaption() + ':';
+        String caption = entity.getClass().getAnnotation(AgiEntity.class).singleCaption() + ':';
         if (isNewInstance) {
             caption += "new";
         } else {
@@ -140,8 +140,6 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
 
     @Override
     public <T> void refreshElementCaption(T entity, String cachedName) {
-        AgiUI agiUI = entity.getClass().getAnnotation(AgiUI.class);
-        if (agiUI == null) throw new RuntimeException("Expected annotation is absent");
         final String newCachedName = generateElementCacheName(entity);
         TabSheet.Tab tab = openedForms.get(cachedName);
         if (tab == null) {

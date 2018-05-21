@@ -2,7 +2,7 @@ package com.sepnotican.agi.core.form;
 
 
 import com.google.common.collect.Lists;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.form.util.EntityNamesResolver;
 import com.vaadin.ui.MenuBar;
 import org.reflections.Reflections;
@@ -40,25 +40,25 @@ public class MainMenuGenerator {
         for (String prefix : packagesToScan) {
 
             Reflections reflections = new Reflections(prefix);
-            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AgiUI.class);
+            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AgiEntity.class);
 
             annotated.stream().sorted((c1, c2) -> {
-                String name1 = c1.getAnnotation(AgiUI.class).manyCaption();
-                String name2 = c2.getAnnotation(AgiUI.class).manyCaption();
+                String name1 = c1.getAnnotation(AgiEntity.class).manyCaption();
+                String name2 = c2.getAnnotation(AgiEntity.class).manyCaption();
                 return name1.compareTo(name2);
             }).forEach(aClass -> {
 
-                String menuPath = aClass.getAnnotation(AgiUI.class).menuPath();
+                String menuPath = aClass.getAnnotation(AgiEntity.class).menuPath();
                 if (menuPath.equals("")) {
                     menuBar.addItem(namesResolver.getManyName(aClass)
-                            , aClass.getAnnotation(AgiUI.class).icon(),
+                            , aClass.getAnnotation(AgiEntity.class).icon(),
                             event -> listFormHandler.showAbstractListForm(aClass));
                 } else {
                     ArrayList<String> path = Lists.newArrayList(menuPath.split("/"));
                     path.removeIf(String::isEmpty);
                     MenuBar.MenuItem containerElement = findContainerElement(path);
                     containerElement.addItem(namesResolver.getManyName(aClass)
-                            , aClass.getAnnotation(AgiUI.class).icon(),
+                            , aClass.getAnnotation(AgiEntity.class).icon(),
                             event -> listFormHandler.showAbstractListForm(aClass));
                 }
 

@@ -1,7 +1,7 @@
 package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
@@ -16,8 +16,9 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Data
-@AgiUI(menuPath = "/etc", icon = VaadinIcons.CONNECT,
-        singleCaption = "contact", manyCaption = "Contacts")
+@AgiEntity(menuPath = "/etc", icon = VaadinIcons.CONNECT,
+        singleCaption = "contact", manyCaption = "Contacts",
+        fieldForInputSearch = "id")
 public class Contact {
 
     @Id

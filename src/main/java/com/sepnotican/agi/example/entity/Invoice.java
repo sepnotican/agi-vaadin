@@ -1,7 +1,7 @@
 package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.vaadin.icons.VaadinIcons;
@@ -17,8 +17,9 @@ import javax.persistence.ManyToOne;
 @Entity
 @Data
 @ToString
-@AgiUI(singleCaption = "Invoice", manyCaption = "Invoices", icon = VaadinIcons.INVOICE,
-        menuPath = "/etc/submenu/mysecond/third")
+@AgiEntity(singleCaption = "Invoice", manyCaption = "Invoices", icon = VaadinIcons.INVOICE,
+        menuPath = "/etc/submenu/mysecond/third",
+        fieldForInputSearch = "id")
 public class Invoice {
 
     @Id

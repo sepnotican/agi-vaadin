@@ -1,8 +1,10 @@
 package com.sepnotican.agi.example.entity;
 
+import com.google.common.base.Joiner;
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.LinkedObject;
+import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.vaadin.icons.VaadinIcons;
 import lombok.Data;
@@ -19,8 +21,10 @@ import javax.persistence.Table;
 @Table(name = "orders")
 @Data
 @ToString
-@AgiUI(singleCaption = "Order", manyCaption = "Orders", icon = VaadinIcons.INVOICE,
-        menuPath = "/etc/submenu/mysecond")
+@AgiEntity(singleCaption = "Order", manyCaption = "Orders", icon = VaadinIcons.INVOICE,
+        menuPath = "/etc/submenu/mysecond",
+        fieldForInputSearch = "id")
+@RepresentationResolver("getId")
 public class Order {
 
 
@@ -37,14 +41,18 @@ public class Order {
     Customer customer;
 
     @LinkedObject
-    @Synonym("Order")
+    @Synonym("Order linked")
     @ManyToOne
     @JoinColumn(name = "order_id")
     @AgiDrawOrder(3)
-    Order order;
+    Order orderFrom;
 
     @Synonym("Operator's comment")
     String comment;
 
     //goods
+
+    public String getOrderRepresentation() {
+        return Joiner.on(":").join(id, customer.getFullName(), comment);
+    }
 }

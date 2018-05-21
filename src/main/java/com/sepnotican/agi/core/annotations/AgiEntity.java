@@ -14,11 +14,12 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface AgiUI {
+public @interface AgiEntity {
     String singleCaption() default "";
     String manyCaption() default "";
     VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
-    String fieldForInputSearch() default "";
+
+    String fieldForInputSearch();
 
     String menuPath() default "";
 }

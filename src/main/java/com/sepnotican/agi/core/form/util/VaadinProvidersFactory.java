@@ -21,8 +21,8 @@ public class VaadinProvidersFactory {
                     classMember = field.get(anObject);
                     field.setAccessible(false);
                 } else classMember = field.get(anObject);
-                if (classMember != null) return (String) method.invoke(classMember);
-                return (String) method.invoke(anObject);
+                if (classMember != null) return String.valueOf(method.invoke(classMember));
+                else return "";
             } catch (IllegalAccessException | InvocationTargetException e) {
                 log.error(e.getMessage(), e);
             }
@@ -44,7 +44,7 @@ public class VaadinProvidersFactory {
         final Method foundMethod = findMethodByName(field, methodName);
         return (ItemCaptionGenerator<T>) anObject -> {
             try {
-                return (String) foundMethod.invoke(anObject);
+                return String.valueOf(foundMethod.invoke(anObject));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 log.error(e.getMessage());
             }
@@ -54,7 +54,7 @@ public class VaadinProvidersFactory {
 
     protected static Method findMethodByName(Field field, String methodName) {
         for (Method declaredMethod : field.getType().getDeclaredMethods()) {
-            return declaredMethod;
+            if (declaredMethod.getName().equals(methodName)) return declaredMethod;
         }
         RepresentationResolverExecption execption = new RepresentationResolverExecption("Can't find method=" + methodName);
         log.error("Method with annotation RepresentationResolver not found in class " + field.getType().getCanonicalName(), execption);

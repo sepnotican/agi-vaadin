@@ -1,6 +1,6 @@
 package com.sepnotican.agi.example.entity;
 
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "trade_deals")
-@AgiUI(manyCaption = "Trade deals",
+@AgiEntity(manyCaption = "Trade deals",
         singleCaption = "Trade deal", fieldForInputSearch = "id",
         menuPath = "/Trade")
 @Getter

@@ -1,7 +1,7 @@
 package com.sepnotican.agi.core.form.generic;
 
 import com.google.common.collect.ImmutableSet;
-import com.sepnotican.agi.core.annotations.AgiUI;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
@@ -118,8 +118,8 @@ public class GenericFieldGenerator {
     @SuppressWarnings("unchecked")
     protected com.vaadin.ui.Component generateLinkedObjectField(Field field) {
         final Class<?> fieldType = field.getType();
-        if (!fieldType.isAnnotationPresent(AgiUI.class)) {
-            log.error("Attempt to create field without AgiUI annotation. Classname = {} Field name = {}",
+        if (!fieldType.isAnnotationPresent(AgiEntity.class)) {
+            log.error("Attempt to create field without AgiEntity annotation. Classname = {} Field name = {}",
                     field.getClass().getCanonicalName(), field.getName());
             return null;
         }
@@ -138,10 +138,10 @@ public class GenericFieldGenerator {
             @SneakyThrows
             public Object apply(Object o) {
                 if (o instanceof String) {
-                    final String synonymFieldName = fieldType.getAnnotation(AgiUI.class).fieldForInputSearch();
+                    String synonymFieldName = fieldType.getAnnotation(AgiEntity.class).fieldForInputSearch();
                     Class<?> synonymFieldType = fieldType.getDeclaredField(synonymFieldName).getType();
                     CompareType compareType = synonymFieldType == String.class ? CompareType.LIKE : CompareType.EQUALS;
-                    return ImmutableSet.of(new CriteriaFilter(fieldType, synonymFieldName, o.toString(), compareType));
+                    return ImmutableSet.of(new CriteriaFilter(fieldType, synonymFieldName, o, compareType));
                 } else return o;
             }
         }));
