@@ -1,6 +1,7 @@
 package com.sepnotican.agi.core.form.generic;
 
-import com.sepnotican.agi.core.annotations.AgiValueProvider;
+import com.google.common.collect.ImmutableSet;
+import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.dao.CompareType;
 import com.sepnotican.agi.core.dao.CriteriaFilter;
@@ -29,7 +30,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -124,25 +127,26 @@ public class AbstractListForm<T> extends VerticalLayout {
     protected void createGridColumns() {
         grid.removeAllColumns();
         for (Field field : aClass.getDeclaredFields()) {
-            if (isNotIgnoredType(field.getType())) {
+            if (!isIgnoredType(field.getType())) {
                 Grid.Column<T, ?> tColumn;
                 if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
                     tColumn = createColumnWithRepresentationResolver(field);
-                } else if (field.isAnnotationPresent(AgiValueProvider.class)) {
-                    tColumn = createColumnWithAgiValueProvider(field);
                 } else {
                     tColumn = grid.addColumn(field.getName());
                 }
                 genericFieldGenerator.makeUpCaptionForField(field, tColumn);
             }
         }
+        for (Method method : aClass.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(AgiColumnValueProvider.class)) {
+                Grid.Column<T, ?> tColumn = createColumnWithAgiValueProvider(method);
+                genericFieldGenerator.makeUpCaptionForMethodProvidedField(method, tColumn);
+            }
+        }
     }
 
-    private Grid.Column<T, ?> createColumnWithAgiValueProvider(Field field) {
-        String methodQualifier = field.getAnnotation(AgiValueProvider.class).value();
-        Grid.Column<T, String> column = grid.addColumn(VaadinProvidersFactory.getValueProvider(aClass, methodQualifier));
-        column.setSortOrderProvider(direction -> Stream.of(new QuerySortOrder(field.getName(), direction)));
-        column.setSortable(true);
+    private Grid.Column<T, ?> createColumnWithAgiValueProvider(Method method) {
+        Grid.Column<T, String> column = grid.addColumn(VaadinProvidersFactory.getValueProvider(method));
         return column;
     }
 
@@ -154,8 +158,14 @@ public class AbstractListForm<T> extends VerticalLayout {
         return column;
     }
 
-    protected boolean isNotIgnoredType(Class<?> type) {
-        return !type.isAssignableFrom(Map.class);
+    protected boolean isIgnoredType(Class<?> type) {
+        Set<Class> ignoredClasses = ImmutableSet.of(Map.class, List.class, Set.class);
+        for (Class iclass : ignoredClasses) {
+            if (type.isAssignableFrom(iclass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void createCommandPanel() {

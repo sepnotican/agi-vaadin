@@ -1,8 +1,8 @@
 package com.sepnotican.agi.example.entity;
 
+import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
 import com.sepnotican.agi.core.annotations.AgiUI;
-import com.sepnotican.agi.core.annotations.AgiValueProvider;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
@@ -56,12 +56,11 @@ public class Customer {
     @AgiDrawOrder(drawOrder = 5)
     private EnumColor color;
 
-    @AgiValueProvider("countOfTradeDeals")
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
-    @AgiValueProvider("countOfTradeDeals")
-    public ValueProvider countOfDeals() {
+    @AgiColumnValueProvider(value = "countOfTradeDeals", sortOrderField = "tradeDeals")
+    public static ValueProvider<Customer, String> countOfDeals() {
         return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
     }
 

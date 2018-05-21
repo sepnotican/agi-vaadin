@@ -1,6 +1,5 @@
 package com.sepnotican.agi.core.form.util;
 
-import com.sepnotican.agi.core.annotations.AgiValueProvider;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.ui.ItemCaptionGenerator;
@@ -32,9 +31,13 @@ public class VaadinProvidersFactory {
         };
     }
 
-    public static <T, F> ValueProvider<T, F> getValueProvider(Class aClass, String methodName) {
-        final Method method = findListFormValueProviderMethodByName(aClass, methodName);
-        return vp -> method.invoke(vp); //todo
+    public static <T, F> ValueProvider<T, F> getValueProvider(Method method) {
+        try {
+            return (ValueProvider<T, F>) method.invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
 
@@ -59,18 +62,6 @@ public class VaadinProvidersFactory {
         }
         RepresentationResolverExecption execption = new RepresentationResolverExecption("Can't find method=" + methodName);
         log.error("Method with annotation RepresentationResolver not found in class " + field.getType().getCanonicalName(), execption);
-        throw execption;
-    }
-
-    protected static Method findListFormValueProviderMethodByName(Class aClass, String methodName) {
-        for (Method declaredMethod : aClass.getDeclaredMethods()) {
-            if (declaredMethod.isAnnotationPresent(AgiValueProvider.class) &&
-                    declaredMethod.getAnnotation(AgiValueProvider.class).value().equals(methodName)) {
-                return declaredMethod;
-            }
-        }
-        RepresentationResolverExecption execption = new RepresentationResolverExecption("Can't find method=" + methodName);
-        log.error("Method with annotation AgiValueProvider not found in class " + aClass.getCanonicalName(), execption);
         throw execption;
     }
 

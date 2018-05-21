@@ -9,8 +9,10 @@ import java.lang.annotation.Target;
 /**
  * Provides a ValueProvider for {@link com.sepnotican.agi.core.form.generic.AbstractListForm}
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AgiValueProvider {
+public @interface AgiColumnValueProvider {
     String value();
+
+    String sortOrderField();
 }

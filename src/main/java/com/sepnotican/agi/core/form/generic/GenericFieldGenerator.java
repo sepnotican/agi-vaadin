@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 @Component
 @Slf4j
@@ -152,5 +153,11 @@ public class GenericFieldGenerator {
         if (field.isAnnotationPresent(Synonym.class)) {
             column.setCaption(field.getAnnotation(Synonym.class).value());
         } else column.setCaption(field.getName());
+    }
+
+    protected void makeUpCaptionForMethodProvidedField(Method method, Grid.Column column) {
+        if (method.isAnnotationPresent(Synonym.class)) {
+            column.setCaption(method.getAnnotation(Synonym.class).value());
+        } else column.setCaption(method.getName());
     }
 }
