@@ -18,7 +18,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "trade_deals")
 @AgiUI(manyCaption = "Trade deals",
-        singleCaption = "Trade deal", fieldForInputSearch = "id")
+        singleCaption = "Trade deal", fieldForInputSearch = "id",
+        menuPath = "/Trade")
 @Getter
 @Setter
 @NoArgsConstructor

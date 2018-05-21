@@ -18,11 +18,11 @@ public class UIOrderComparator implements Comparator<Field> {
         else if (!o1.isAnnotationPresent(AgiDrawOrder.class)
                 && !o2.isAnnotationPresent(AgiDrawOrder.class))
             return 0;
-        else if (o1.getAnnotation(AgiDrawOrder.class).drawOrder() >
-                o2.getAnnotation(AgiDrawOrder.class).drawOrder())
+        else if (o1.getAnnotation(AgiDrawOrder.class).value() >
+                o2.getAnnotation(AgiDrawOrder.class).value())
             return 1;
-        else if ((o1.getAnnotation(AgiDrawOrder.class).drawOrder() <
-                o2.getAnnotation(AgiDrawOrder.class).drawOrder()))
+        else if ((o1.getAnnotation(AgiDrawOrder.class).value() <
+                o2.getAnnotation(AgiDrawOrder.class).value()))
             return -1;
 
         return 0;

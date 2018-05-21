@@ -27,7 +27,8 @@ import java.util.Set;
 @Table(name = "customer")
 @AgiUI(manyCaption = "Our Customers ",
         singleCaption = "Customer",
-        fieldForInputSearch = "name")
+        fieldForInputSearch = "name",
+        menuPath = "/Trade")
 @RepresentationResolver("fullname")
 @Getter
 @Setter
@@ -38,12 +39,12 @@ public class Customer {
     @Id
     @GeneratedValue
     @Synonym("Identifier")
-    @AgiDrawOrder(drawOrder = -1)
+    @AgiDrawOrder(value = -1)
     private Long id;
 
     @Column
     @Synonym("Customer caption")
-    @AgiDrawOrder(drawOrder = 2)
+    @AgiDrawOrder(value = 2)
     private String name;
 
     @Column
@@ -53,7 +54,7 @@ public class Customer {
 
     @Column
     @Synonym("Color")
-    @AgiDrawOrder(drawOrder = 5)
+    @AgiDrawOrder(value = 5)
     private EnumColor color;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

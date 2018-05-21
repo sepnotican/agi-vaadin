@@ -2,7 +2,6 @@ package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiDrawOrder;
 import com.sepnotican.agi.core.annotations.AgiUI;
-import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.vaadin.icons.VaadinIcons;
@@ -16,26 +15,24 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Data
-@AgiUI(menuPath = "/etc", icon = VaadinIcons.CONNECT,
-        singleCaption = "contact", manyCaption = "Contacts")
-public class Contact {
+@AgiUI(singleCaption = "Order", manyCaption = "Orders", icon = VaadinIcons.INVOICE,
+        menuPath = "/etc/submenu/mysecond")
+public class Order {
+
 
     @Id
     @GeneratedValue
     @AgiDrawOrder(3)
     Long id;
 
-    @Synonym("Operator's comment")
-    @BigString
-    @AgiDrawOrder(1)
-    String comment;
-
     @LinkedObject
     @Synonym("Customer")
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @AgiDrawOrder(-2)
     Customer customer;
 
+    @Synonym("Operator's comment")
+    String comment;
 
+    //goods
 }

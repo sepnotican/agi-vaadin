@@ -15,6 +15,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface AgiDrawOrder {
-    int drawOrder() default 0;
+    int value() default 0;
 
 }
