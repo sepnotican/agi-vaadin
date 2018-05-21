@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -58,7 +58,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
         Class clazz = entity.getClass();
         Field[] fieldsArray = clazz.getDeclaredFields();
-        ArrayList<Field> fieldArrayList = createOrderedElementsList(fieldsArray);
+        LinkedList<Field> fieldArrayList = createOrderedElementsList(fieldsArray);
 
         for (Field field : fieldArrayList) {
 
@@ -77,9 +77,9 @@ public class AbstractElementForm<T> extends VerticalLayout {
         if (!isNewInstance) binder.readBean(entity);
     }
 
-    protected ArrayList<Field> createOrderedElementsList(Field[] fieldsArray) {
+    protected LinkedList<Field> createOrderedElementsList(Field[] fieldsArray) {
         return Arrays.stream(fieldsArray)
-                .sorted(new UIOrderComparator()).collect(Collectors.toCollection(ArrayList::new));
+                .sorted(new UIOrderComparator()).collect(Collectors.toCollection(LinkedList::new));
     }
 
     protected void initDefaultControlPanel(Binder<T> binder) {
