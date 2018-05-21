@@ -6,6 +6,7 @@ import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.vaadin.icons.VaadinIcons;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "orders")
 @Data
+@ToString
 @AgiUI(singleCaption = "Order", manyCaption = "Orders", icon = VaadinIcons.INVOICE,
         menuPath = "/etc/submenu/mysecond")
 public class Order {
@@ -33,6 +35,13 @@ public class Order {
     @JoinColumn(name = "customer_id")
     @AgiDrawOrder(3)
     Customer customer;
+
+    @LinkedObject
+    @Synonym("Order")
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @AgiDrawOrder(3)
+    Order order;
 
     @Synonym("Operator's comment")
     String comment;

@@ -6,6 +6,7 @@ import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.vaadin.icons.VaadinIcons;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Data
+@ToString
 @AgiUI(singleCaption = "Invoice", manyCaption = "Invoices", icon = VaadinIcons.INVOICE,
         menuPath = "/etc/submenu/mysecond/third")
 public class Invoice {

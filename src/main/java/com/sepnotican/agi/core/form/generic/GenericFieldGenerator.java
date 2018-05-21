@@ -125,7 +125,12 @@ public class GenericFieldGenerator {
         }
         ComboBox comboBox = new ComboBox<>();
         comboBox.setEmptySelectionCaption(EMPTY_ENUM_TEXT);
-        final String methodName = field.getType().getAnnotation(RepresentationResolver.class).value();
+        String methodName;
+        if (field.getType().isAnnotationPresent(RepresentationResolver.class)) {
+            methodName = field.getType().getAnnotation(RepresentationResolver.class).value();
+        } else {
+            methodName = "toString";
+        }
         comboBox.setItemCaptionGenerator(VaadinProvidersFactory.getItemCaptionGenerator(field, methodName));
         comboBox.setDataProvider(new GenericBackendDataProvider(fieldType,
                 genericDaoFactory.getGenericDaoForClass(fieldType)).withConvertedFilter(new SerializableFunction() {

@@ -1,6 +1,5 @@
 package com.sepnotican.agi.core.form.util;
 
-import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.ui.ItemCaptionGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -55,10 +54,7 @@ public class VaadinProvidersFactory {
 
     protected static Method findMethodByName(Field field, String methodName) {
         for (Method declaredMethod : field.getType().getDeclaredMethods()) {
-            if (declaredMethod.isAnnotationPresent(RepresentationResolver.class) &&
-                    declaredMethod.getAnnotation(RepresentationResolver.class).value().equals(methodName)) {
-                return declaredMethod;
-            }
+            return declaredMethod;
         }
         RepresentationResolverExecption execption = new RepresentationResolverExecption("Can't find method=" + methodName);
         log.error("Method with annotation RepresentationResolver not found in class " + field.getType().getCanonicalName(), execption);
