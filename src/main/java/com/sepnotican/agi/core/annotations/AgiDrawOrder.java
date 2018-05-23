@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * to define to specific coordinates in the grid
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface AgiDrawOrder {
     int value() default 0;
 

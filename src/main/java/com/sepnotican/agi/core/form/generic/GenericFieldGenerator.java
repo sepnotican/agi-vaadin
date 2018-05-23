@@ -160,9 +160,16 @@ public class GenericFieldGenerator {
         } else column.setCaption(field.getName());
     }
 
-    protected void makeUpCaptionForMethodProvidedField(Method method, Grid.Column column) {
+    protected void makeUpCaptionForMethodProvidedColumn(Method method, Grid.Column column) {
         if (method.isAnnotationPresent(Synonym.class)) {
             column.setCaption(method.getAnnotation(Synonym.class).value());
         } else column.setCaption(method.getName());
     }
+
+    protected void makeUpCaptionForMethodProvidedComponent(Method method, com.vaadin.ui.Component component) {
+        if (method.isAnnotationPresent(Synonym.class)) {
+            component.setCaption(method.getAnnotation(Synonym.class).value());
+        } else component.setCaption(method.getName());
+    }
+
 }

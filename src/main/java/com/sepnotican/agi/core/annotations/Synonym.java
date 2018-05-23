@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * to create user-friendly captions to the fields.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD})
 public @interface Synonym {
     String value();
 }

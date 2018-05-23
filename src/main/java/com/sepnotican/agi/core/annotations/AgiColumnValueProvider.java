@@ -13,6 +13,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgiColumnValueProvider {
     String value();
-
-    String sortOrderField();
 }

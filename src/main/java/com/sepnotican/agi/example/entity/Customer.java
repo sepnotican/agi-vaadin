@@ -62,7 +62,9 @@ public class Customer {
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
-    @AgiColumnValueProvider(value = "countOfTradeDeals", sortOrderField = "tradeDeals")
+    @AgiColumnValueProvider("countOfTradeDeals")
+    @Synonym("Count of trade deals with the client")
+    @AgiDrawOrder(100)
     public static ValueProvider<Customer, String> countOfDeals() {
         return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
     }

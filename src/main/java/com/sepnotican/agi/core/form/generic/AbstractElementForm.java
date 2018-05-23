@@ -1,9 +1,11 @@
 package com.sepnotican.agi.core.form.generic;
 
+import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
 import com.sepnotican.agi.core.dao.GenericDao;
 import com.sepnotican.agi.core.dao.GenericDaoFactory;
 import com.sepnotican.agi.core.form.IFormHandler;
 import com.sepnotican.agi.core.form.util.UIOrderComparator;
+import com.sepnotican.agi.core.form.util.VaadinProvidersFactory;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.icons.VaadinIcons;
@@ -12,16 +14,20 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @org.springframework.stereotype.Component
 @Scope("prototype")
@@ -34,7 +40,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
     protected String BTN_RELOAD_TEXT;
 
     @Autowired
-    GenericFieldGenerator fieldGenerator;
+    GenericFieldGenerator genericFieldGenerator;
     @Autowired
     GenericDaoFactory genericDaoFactory;
 
@@ -58,28 +64,36 @@ public class AbstractElementForm<T> extends VerticalLayout {
 
         Class clazz = entity.getClass();
         Field[] fieldsArray = clazz.getDeclaredFields();
-        LinkedList<Field> fieldArrayList = createOrderedElementsList(fieldsArray);
+        Method[] methodsArray = clazz.getDeclaredMethods();
+        LinkedList<AnnotatedElement> elementLinkedList = createOrderedElementsList(Stream.concat(
+                Stream.of(fieldsArray),
+                Stream.of(methodsArray).filter(m -> m.isAnnotationPresent(AgiColumnValueProvider.class))));
 
-        for (Field field : fieldArrayList) {
-
-            Component component = fieldGenerator.getComponentByFieldAndBind(field, binder);
-
-            if (component == null) continue;
-
-            if (field.isAnnotationPresent(javax.persistence.Id.class)) {
-                ((HasValue) component).setReadOnly(true);
+        for (AnnotatedElement element : elementLinkedList) {
+            if (element instanceof Field) {
+                Field field = (Field) element;
+                Component component = genericFieldGenerator.getComponentByFieldAndBind(field, binder);
+                if (component == null) continue;
+                if (field.isAnnotationPresent(javax.persistence.Id.class)) {
+                    ((HasValue) component).setReadOnly(true);
+                }
+                addComponent(component);
+                component.setWidth(40f, Unit.PERCENTAGE);
+            } else if (element instanceof Method) {
+                Method method = (Method) element;
+                TextField textField = new TextField();
+                genericFieldGenerator.makeUpCaptionForMethodProvidedComponent(method, textField);
+                textField.setValue(String.valueOf(Objects.requireNonNull(VaadinProvidersFactory.getValueProvider(method)).apply(entity)));
+                textField.setReadOnly(true);
+                addComponent(textField);
             }
-
-            addComponent(component);
-            component.setWidth(40f, Unit.PERCENTAGE);
         }
         binder.bindInstanceFields(entity);
         if (!isNewInstance) binder.readBean(entity);
     }
 
-    protected LinkedList<Field> createOrderedElementsList(Field[] fieldsArray) {
-        return Arrays.stream(fieldsArray)
-                .sorted(new UIOrderComparator()).collect(Collectors.toCollection(LinkedList::new));
+    protected LinkedList<AnnotatedElement> createOrderedElementsList(Stream<AnnotatedElement> annotatedElements) {
+        return annotatedElements.sorted(new UIOrderComparator()).collect(Collectors.toCollection(LinkedList::new));
     }
 
     protected void initDefaultControlPanel(Binder<T> binder) {

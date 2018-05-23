@@ -140,7 +140,7 @@ public class AbstractListForm<T> extends VerticalLayout {
         for (Method method : aClass.getDeclaredMethods()) {
             if (method.isAnnotationPresent(AgiColumnValueProvider.class)) {
                 Grid.Column<T, ?> tColumn = createColumnWithAgiValueProvider(method);
-                genericFieldGenerator.makeUpCaptionForMethodProvidedField(method, tColumn);
+                genericFieldGenerator.makeUpCaptionForMethodProvidedColumn(method, tColumn);
             }
         }
     }
