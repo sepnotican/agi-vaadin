@@ -14,5 +14,5 @@ public @interface AgiForm {
 
     String menuPath() default "";
 
-    VaadinIcons icon() default VaadinIcons.ABACUS;
+    VaadinIcons icon() default VaadinIcons.AUTOMATION;
 }
