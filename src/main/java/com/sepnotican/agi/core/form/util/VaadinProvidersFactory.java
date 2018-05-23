@@ -56,7 +56,8 @@ public class VaadinProvidersFactory {
         for (Method declaredMethod : field.getType().getDeclaredMethods()) {
             if (declaredMethod.getName().equals(methodName)) return declaredMethod;
         }
-        RepresentationResolverExecption execption = new RepresentationResolverExecption("Can't find method=" + methodName);
+        RepresentationResolverExecption execption = new RepresentationResolverExecption(
+                String.format("Can't find method=%s for field=%s", methodName, field.getName()));
         log.error("Method with annotation RepresentationResolver not found in class " + field.getType().getCanonicalName(), execption);
         throw execption;
     }

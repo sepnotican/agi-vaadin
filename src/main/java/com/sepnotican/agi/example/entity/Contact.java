@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 @Entity
 @Data
 @AgiEntity(menuPath = "/etc", icon = VaadinIcons.CONNECT,
-        singleCaption = "contact", manyCaption = "Contacts",
+        singleCaption = "contact", menuCaption = "Contacts",
         fieldForInputSearch = "id")
 public class Contact {
 

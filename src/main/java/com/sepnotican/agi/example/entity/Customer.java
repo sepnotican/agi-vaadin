@@ -26,7 +26,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "customer")
-@AgiEntity(manyCaption = "Our Customers ",
+@AgiEntity(menuCaption = "Our Customers ",
         singleCaption = "Customer",
         fieldForInputSearch = "name",
         menuPath = "/Trade")

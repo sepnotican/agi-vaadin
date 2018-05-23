@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 @Entity
 @Data
 @ToString
-@AgiEntity(singleCaption = "Invoice", manyCaption = "Invoices", icon = VaadinIcons.INVOICE,
+@AgiEntity(singleCaption = "Invoice", menuCaption = "Invoices", icon = VaadinIcons.INVOICE,
         menuPath = "/etc/submenu/mysecond/third",
         fieldForInputSearch = "id")
 public class Invoice {

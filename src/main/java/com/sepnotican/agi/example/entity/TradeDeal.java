@@ -2,6 +2,7 @@ package com.sepnotican.agi.example.entity;
 
 import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.LinkedObject;
+import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,13 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "trade_deals")
-@AgiEntity(manyCaption = "Trade deals",
+@AgiEntity(menuCaption = "Trade deals",
         singleCaption = "Trade deal", fieldForInputSearch = "id",
         menuPath = "/Trade")
 @Getter
 @Setter
 @NoArgsConstructor
+@RepresentationResolver("representation")
 public class TradeDeal {
 
     @Column
@@ -42,6 +44,10 @@ public class TradeDeal {
 
         this.sum = sum;
         this.customer = customer;
+    }
+
+    public String representation() {
+        return "" + getId() + ":" + getCustomer() + " $" + getSum();
     }
 
 }

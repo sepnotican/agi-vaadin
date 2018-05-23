@@ -16,7 +16,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface AgiEntity {
     String singleCaption() default "";
-    String manyCaption() default "";
+
+    String menuCaption() default "";
     VaadinIcons icon() default VaadinIcons.FILE_PICTURE;
 
     String fieldForInputSearch();

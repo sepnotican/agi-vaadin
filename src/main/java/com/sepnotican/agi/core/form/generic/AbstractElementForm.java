@@ -1,6 +1,7 @@
 package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
+import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.dao.GenericDao;
 import com.sepnotican.agi.core.dao.GenericDaoFactory;
 import com.sepnotican.agi.core.form.IFormHandler;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Scope;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -72,6 +74,8 @@ public class AbstractElementForm<T> extends VerticalLayout {
         for (AnnotatedElement element : elementLinkedList) {
             if (element instanceof Field) {
                 Field field = (Field) element;
+
+                if ((field.getModifiers() & Modifier.STATIC) > 0) continue;
                 Component component = genericFieldGenerator.getComponentByFieldAndBind(field, binder);
                 if (component == null) continue;
                 if (field.isAnnotationPresent(javax.persistence.Id.class)) {
@@ -81,6 +85,7 @@ public class AbstractElementForm<T> extends VerticalLayout {
                 component.setWidth(40f, Unit.PERCENTAGE);
             } else if (element instanceof Method) {
                 Method method = (Method) element;
+                if ((method.getModifiers() & Modifier.STATIC) == 0) continue;
                 TextField textField = new TextField();
                 genericFieldGenerator.makeUpCaptionForMethodProvidedComponent(method, textField);
                 textField.setValue(String.valueOf(Objects.requireNonNull(VaadinProvidersFactory.getValueProvider(method)).apply(entity)));
@@ -99,8 +104,10 @@ public class AbstractElementForm<T> extends VerticalLayout {
     protected void initDefaultControlPanel(Binder<T> binder) {
         defaultControlPanel = new HorizontalLayout();
         MenuBar menuBar = new MenuBar();
-        createSaveButton(binder, menuBar);
-        createReloadButton(binder, menuBar);
+        if (entity.getClass().isAnnotationPresent(AgiEntity.class)) {
+            createSaveButton(binder, menuBar);
+            createReloadButton(binder, menuBar);
+        } // else - AgiForm.class , todo commands
         defaultControlPanel.addComponent(menuBar);
         addComponent(defaultControlPanel);
     }

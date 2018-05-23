@@ -1,5 +1,7 @@
 package com.sepnotican.agi.core.annotations;
 
+import com.vaadin.icons.VaadinIcons;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,4 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgiForm {
     String caption();
+
+    String menuPath() default "";
+
+    VaadinIcons icon() default VaadinIcons.ABACUS;
 }

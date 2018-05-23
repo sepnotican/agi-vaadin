@@ -3,8 +3,12 @@ package com.sepnotican.agi.core.form;
 
 import com.google.common.collect.Lists;
 import com.sepnotican.agi.core.annotations.AgiEntity;
+import com.sepnotican.agi.core.annotations.AgiForm;
 import com.sepnotican.agi.core.form.util.EntityNamesResolver;
+import com.sepnotican.agi.core.form.util.UIOrderComparator;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.MenuBar;
+import lombok.SneakyThrows;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -27,11 +32,11 @@ public class MainMenuGenerator {
     @Autowired
     EntityNamesResolver namesResolver;
 
-    private IFormHandler listFormHandler;
+    private IFormHandler formHandler;
     private MenuBar menuBar = new MenuBar();
 
-    public MainMenuGenerator(IFormHandler listFormHandler) {
-        this.listFormHandler = listFormHandler;
+    public MainMenuGenerator(IFormHandler formHandler) {
+        this.formHandler = formHandler;
     }
 
     @PostConstruct
@@ -40,32 +45,52 @@ public class MainMenuGenerator {
         for (String prefix : packagesToScan) {
 
             Reflections reflections = new Reflections(prefix);
-            Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AgiEntity.class);
+            Set<Class<?>> annotated = new HashSet<>();
+            annotated.addAll(reflections.getTypesAnnotatedWith(AgiEntity.class));
+            annotated.addAll(reflections.getTypesAnnotatedWith(AgiForm.class));
 
-            annotated.stream().sorted((c1, c2) -> {
-                String name1 = c1.getAnnotation(AgiEntity.class).manyCaption();
-                String name2 = c2.getAnnotation(AgiEntity.class).manyCaption();
-                return name1.compareTo(name2);
-            }).forEach(aClass -> {
 
-                String menuPath = aClass.getAnnotation(AgiEntity.class).menuPath();
+            annotated.stream().sorted(new UIOrderComparator()).forEach(aClass -> {
+
+                String menuPath;
+                if (aClass.isAnnotationPresent(AgiEntity.class)) {
+                    menuPath = aClass.getAnnotation(AgiEntity.class).menuPath();
+                } else {
+                    menuPath = aClass.getAnnotation(AgiForm.class).menuPath();
+                }
+                VaadinIcons icon;
+                if (aClass.isAnnotationPresent(AgiEntity.class)) {
+                    icon = aClass.getAnnotation(AgiEntity.class).icon();
+                } else {
+                    icon = aClass.getAnnotation(AgiForm.class).icon();
+                }
                 if (menuPath.equals("")) {
-                    menuBar.addItem(namesResolver.getManyName(aClass)
-                            , aClass.getAnnotation(AgiEntity.class).icon(),
-                            event -> listFormHandler.showAbstractListForm(aClass));
+                    menuBar.addItem(namesResolver.getMenuName(aClass), icon, getMenuCommand(aClass));
                 } else {
                     ArrayList<String> path = Lists.newArrayList(menuPath.split("/"));
                     path.removeIf(String::isEmpty);
                     MenuBar.MenuItem containerElement = findContainerElement(path);
-                    containerElement.addItem(namesResolver.getManyName(aClass)
-                            , aClass.getAnnotation(AgiEntity.class).icon(),
-                            event -> listFormHandler.showAbstractListForm(aClass));
+                    containerElement.addItem(namesResolver.getMenuName(aClass), icon, getMenuCommand(aClass));
                 }
 
-                listFormHandler.getMainLayout().addComponent(menuBar, 0);
+                formHandler.getMainLayout().addComponent(menuBar, 0);
 
             });
         }
+    }
+
+    private MenuBar.Command getMenuCommand(Class aClass) {
+        return new MenuBar.Command() {
+            @Override
+            @SneakyThrows
+            public void menuSelected(MenuBar.MenuItem event) {
+                if (aClass.isAnnotationPresent(AgiEntity.class)) {
+                    formHandler.showAbstractListForm(aClass);
+                } else if (aClass.isAnnotationPresent(AgiForm.class)) {
+                    formHandler.showAbstractElementForm(aClass.newInstance(), false);
+                }
+            }
+        };
     }
 
     private MenuBar.MenuItem findContainerElement(ArrayList<String> path) {
