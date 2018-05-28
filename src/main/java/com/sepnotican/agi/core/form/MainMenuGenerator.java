@@ -87,7 +87,7 @@ public class MainMenuGenerator {
                 if (aClass.isAnnotationPresent(AgiEntity.class)) {
                     formHandler.showAbstractListForm(aClass);
                 } else if (aClass.isAnnotationPresent(AgiForm.class)) {
-                    formHandler.showAbstractElementForm(aClass.newInstance(), false);
+                    formHandler.showAbstractElementForm(context.getBean(aClass), false);
                 }
             }
         };

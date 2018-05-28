@@ -2,6 +2,8 @@ package com.sepnotican.agi.core.form.generic;
 
 import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
 import com.sepnotican.agi.core.annotations.AgiEntity;
+import com.sepnotican.agi.core.annotations.AgiForm;
+import com.sepnotican.agi.core.annotations.Command;
 import com.sepnotican.agi.core.dao.GenericDao;
 import com.sepnotican.agi.core.dao.GenericDaoFactory;
 import com.sepnotican.agi.core.form.IFormHandler;
@@ -40,17 +42,15 @@ public class AbstractElementForm<T> extends VerticalLayout {
     protected String BTN_SAVE_TEXT;
     @Value("${agi.forms.element.reload}")
     protected String BTN_RELOAD_TEXT;
-
-    @Autowired
-    GenericFieldGenerator genericFieldGenerator;
-    @Autowired
-    GenericDaoFactory genericDaoFactory;
-
     protected T entity;
     protected Binder<T> binder;
     protected Layout defaultControlPanel;
     protected IFormHandler formHandler;
     protected String formCachedName;
+    @Autowired
+    GenericFieldGenerator genericFieldGenerator;
+    @Autowired
+    GenericDaoFactory genericDaoFactory;
 
     public AbstractElementForm(IFormHandler formHandler) {
         this.formHandler = formHandler;
@@ -61,21 +61,23 @@ public class AbstractElementForm<T> extends VerticalLayout {
         removeAllComponents();
         this.entity = entity;
         binder = new Binder(entity.getClass());
+        initControlPanel(binder);
+        buildFormFields(entity);
+        binder.bindInstanceFields(entity);
+        if (!isNewInstance) binder.readBean(entity);
+    }
 
-        initDefaultControlPanel(binder);
-
+    protected void buildFormFields(T entity) {
         Class clazz = entity.getClass();
         Field[] fieldsArray = clazz.getDeclaredFields();
         Method[] methodsArray = clazz.getDeclaredMethods();
         LinkedList<AnnotatedElement> elementLinkedList = createOrderedElementsList(Stream.concat(
-                Stream.of(fieldsArray),
+                Stream.of(fieldsArray).filter(f -> !f.isAnnotationPresent(Autowired.class) && (f.getModifiers() & Modifier.STATIC) == 0),
                 Stream.of(methodsArray).filter(m -> m.isAnnotationPresent(AgiColumnValueProvider.class))));
 
         for (AnnotatedElement element : elementLinkedList) {
             if (element instanceof Field) {
                 Field field = (Field) element;
-
-                if ((field.getModifiers() & Modifier.STATIC) > 0) continue;
                 Component component = genericFieldGenerator.getComponentByFieldAndBind(field, binder);
                 if (component == null) continue;
                 if (field.isAnnotationPresent(javax.persistence.Id.class)) {
@@ -93,21 +95,33 @@ public class AbstractElementForm<T> extends VerticalLayout {
                 addComponent(textField);
             }
         }
-        binder.bindInstanceFields(entity);
-        if (!isNewInstance) binder.readBean(entity);
     }
 
     protected LinkedList<AnnotatedElement> createOrderedElementsList(Stream<AnnotatedElement> annotatedElements) {
         return annotatedElements.sorted(new UIOrderComparator()).collect(Collectors.toCollection(LinkedList::new));
     }
 
-    protected void initDefaultControlPanel(Binder<T> binder) {
+    protected void initControlPanel(Binder<T> binder) {
         defaultControlPanel = new HorizontalLayout();
         MenuBar menuBar = new MenuBar();
         if (entity.getClass().isAnnotationPresent(AgiEntity.class)) {
             createSaveButton(binder, menuBar);
             createReloadButton(binder, menuBar);
-        } // else - AgiForm.class , todo commands
+        } else if (entity.getClass().isAnnotationPresent(AgiForm.class)) {
+            Stream.of(entity.getClass().getDeclaredMethods())
+                    .filter(m -> m.isAnnotationPresent(Command.class))
+                    .forEach(method -> menuBar.addItem(method.getAnnotation(Command.class).caption(),
+                            method.getAnnotation(Command.class).icon(),
+                            command -> {
+                                try {
+                                    binder.writeBean(entity);
+                                    method.invoke(entity, null);
+                                    binder.readBean(entity);
+                                } catch (Exception e) {
+                                    log.error(e.getMessage(), e);
+                                }
+                            }));
+        }
         defaultControlPanel.addComponent(menuBar);
         addComponent(defaultControlPanel);
     }
