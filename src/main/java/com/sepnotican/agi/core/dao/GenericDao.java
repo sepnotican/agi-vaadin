@@ -1,5 +1,7 @@
 package com.sepnotican.agi.core.dao;
 
+import com.sepnotican.agi.core.annotations.Synonym;
+import com.sepnotican.agi.core.form.IFormHandler;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.shared.data.sort.SortDirection;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -17,10 +18,12 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -31,19 +34,12 @@ public class GenericDao<T> {
     @Autowired
     protected EntityManager entityManager;
     protected Class<T> entityClass;
+    @Autowired
+    IFormHandler formHandler;
+    private Pattern numericPattern = Pattern.compile("^[0-9]+?$");
 
     public GenericDao(Class<T> entityClass) {
         this.entityClass = entityClass;
-    }
-
-    @PostConstruct
-    void pc() {
-        q++;
-    }
-
-    @Override
-    protected void finalize() {
-        w++;
     }
 
     @SuppressWarnings("unchecked")
@@ -99,21 +95,43 @@ public class GenericDao<T> {
     protected void buildPredicate(CriteriaBuilder builder, Root<T> root, CriteriaQuery<T> query, Set<CriteriaFilter> filterSet) {
         if (filterSet == null) return;
         List<Predicate> predicates = new ArrayList<>();
+
         for (CriteriaFilter filter : filterSet) {
-            if (filter.getFieldValue() == null ||
-                    (filter.getFieldValue() instanceof String && ((String) filter.getFieldValue()).isEmpty())) {
-                continue;
-            }
-            if (filter.getCompareType() == CompareType.EQUALS) {
-                predicates.add(builder.equal(root.get(filter.getFieldName()), filter.getFieldValue()));
-            } else if (filter.getCompareType() == CompareType.NOT_EQUALS) {
-                predicates.add((builder.notEqual(root.get(filter.getFieldName()), filter.getFieldValue())));
-            } else if (filter.getCompareType() == CompareType.LIKE) {
-                predicates.add((builder.like(root.get(filter.getFieldName()), "%" + filter.getFieldValue() + "%")));
-            } else if (filter.getCompareType() == CompareType.STARTS_WITH) {
-                predicates.add((builder.like(root.get(filter.getFieldName()), filter.getFieldValue() + "%")));
+            try {
+                if (filter.getFieldValue() == null ||
+                        (filter.getFieldValue() instanceof String && ((String) filter.getFieldValue()).isEmpty()))
+                    continue;
+
+                if (filter.getCompareType() == CompareType.EQUALS) {
+                    predicates.add(builder.equal(root.get(filter.getFieldName()), filter.getFieldValue()));
+                } else if (filter.getCompareType() == CompareType.NOT_EQUALS) {
+                    predicates.add((builder.notEqual(root.get(filter.getFieldName()), filter.getFieldValue())));
+                } else if (filter.getCompareType() == CompareType.LIKE) {
+                    if (filter.getTargetClass().equals(String.class)) {
+                        predicates.add((builder.like(root.get(filter.getFieldName()), "%" + filter.getFieldValue() + "%")));
+                    } else {
+                        predicates.add((builder.like(root.get(filter.getFieldName()), filter.getFieldValue().toString())));
+                    }
+                } else if (filter.getCompareType() == CompareType.STARTS_WITH) {
+                    predicates.add((builder.like(root.get(filter.getFieldName()), filter.getFieldValue() + "%")));
+                }
+            } catch (NumberFormatException nfe) {
+                try {
+                    String caption;
+                    Field field = entityClass.getDeclaredField(filter.getFieldName());
+                    if (field.isAnnotationPresent(Synonym.class)) {
+                        caption = field.getAnnotation(Synonym.class).value();
+                    } else {
+                        caption = filter.getFieldName();
+                    }
+                    formHandler.handleFilterException(caption, nfe);
+                } catch (NoSuchFieldException e) {
+                    log.error(e.getMessage(), e);
+                }
+                break;
             }
         }
+
         query.where(builder.and(predicates.toArray(new Predicate[predicates.size()])));
     }
 

@@ -6,7 +6,7 @@ import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
-import com.sepnotican.agi.example.EnumColor;
+import com.sepnotican.agi.example.ClientLevel;
 import com.vaadin.data.ValueProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,14 +55,14 @@ public class Customer {
     private String description;
 
     @Column
-    @Synonym("Color")
+    @Synonym("Client grade level")
     @AgiDrawOrder(value = 5)
-    private EnumColor color;
+    private ClientLevel color;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
-    @AgiColumnValueProvider("countOfTradeDeals")
+    @AgiColumnValueProvider
     @Synonym("Count of trade deals with the client")
     @AgiDrawOrder(100)
     public static ValueProvider<Customer, String> countOfDeals() {

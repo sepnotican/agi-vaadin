@@ -1,6 +1,6 @@
 package com.sepnotican.agi;
 
-import com.sepnotican.agi.example.EnumColor;
+import com.sepnotican.agi.example.ClientLevel;
 import com.sepnotican.agi.example.entity.Customer;
 import com.sepnotican.agi.example.entity.TradeDeal;
 import com.sepnotican.agi.example.repository.CustomerRepo;
@@ -26,12 +26,12 @@ public class InitDB {
 
     @Test
     public void fillDB() {
-        Customer c1 = new Customer(null, "Vasiliy", "descrip ion", EnumColor.BLACK, null);
-        Customer c2 = new Customer(null, "Semen", "descrip ion", EnumColor.GREEN, null);
-        Customer c3 = new Customer(null, "Pavel petrovi4", "descrip ion", EnumColor.RED, null);
-        Customer c4 = new Customer(null, "Dudka", "descrip ion", EnumColor.WHITE, null);
-        Customer c5 = new Customer(null, "Utka", "descrip ion", EnumColor.BLUE, null);
-        Customer c6 = new Customer(null, "Putka", "descrip ion", EnumColor.BLACK, null);
+        Customer c1 = new Customer(null, "Vasiliy", "descrip ion", ClientLevel.BLACK, null);
+        Customer c2 = new Customer(null, "Semen", "descrip ion", ClientLevel.GREEN, null);
+        Customer c3 = new Customer(null, "Pavel petrovi4", "descrip ion", ClientLevel.RED, null);
+        Customer c4 = new Customer(null, "Dudka", "descrip ion", ClientLevel.WHITE, null);
+        Customer c5 = new Customer(null, "Utka", "descrip ion", ClientLevel.BLUE, null);
+        Customer c6 = new Customer(null, "Putka", "descrip ion", ClientLevel.BLACK, null);
 
         Set<TradeDeal> dealSet1 = new HashSet<>();
         dealSet1.add(new TradeDeal(1000d, c1));

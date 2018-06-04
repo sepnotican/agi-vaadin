@@ -1,5 +1,5 @@
 package com.sepnotican.agi.example;
 
-public enum EnumColor {
+public enum ClientLevel {
     RED, GREEN, BLUE, WHITE, BLACK
 }

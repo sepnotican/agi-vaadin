@@ -10,4 +10,6 @@ public interface IFormHandler {
     <T> void refreshElementCaption(T entity, String formCachedName) throws NoSuchFieldException, IllegalAccessException;
 
     AbstractOrderedLayout getMainLayout();
+
+    void handleFilterException(String fieldName, Exception ex);
 }

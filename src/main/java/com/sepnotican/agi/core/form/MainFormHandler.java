@@ -49,6 +49,15 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
         return this;
     }
 
+    @Override
+    public void handleFilterException(String fieldName, Exception ex) {
+        if (ex instanceof NumberFormatException) {
+            Notification.show(String.format("Value in field \"%s\" must be a number", fieldName));
+        } else {
+            Notification.show(String.format("Value in field \"%s\" is wrong", fieldName));
+        }
+    }
+
     @PostConstruct
     public void init() {
         tabSheet = new TabSheet();
@@ -61,8 +70,6 @@ public class MainFormHandler extends VerticalLayout implements IFormHandler {
             }
             tabsheet.removeTab(tab);
         });
-
-//        tabSheet.setSizeFull();
         tabSheet.setHeight("100%");
         mainLayout.addComponent(tabSheet);
         mainLayout.setExpandRatio(tabSheet, 1.0f);
