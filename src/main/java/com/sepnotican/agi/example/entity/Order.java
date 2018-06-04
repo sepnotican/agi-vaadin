@@ -24,7 +24,7 @@ import javax.persistence.Table;
 @AgiEntity(singleCaption = "Order", menuCaption = "Orders", icon = VaadinIcons.INVOICE,
         menuPath = "/etc/submenu/mysecond",
         fieldForInputSearch = "id")
-@RepresentationResolver("getId")
+@RepresentationResolver("getOrderRepresentation")
 public class Order {
 
 
