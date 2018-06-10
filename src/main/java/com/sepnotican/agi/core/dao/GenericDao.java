@@ -107,7 +107,7 @@ public class GenericDao<T> {
                 } else if (filter.getCompareType() == CompareType.NOT_EQUALS) {
                     predicates.add((builder.notEqual(root.get(filter.getFieldName()), filter.getFieldValue())));
                 } else if (filter.getCompareType() == CompareType.LIKE) {
-                    if (filter.getTargetClass().equals(String.class)) {
+                    if (filter.getFieldValue().getClass().equals(String.class)) {
                         predicates.add((builder.like(root.get(filter.getFieldName()), "%" + filter.getFieldValue() + "%")));
                     } else {
                         predicates.add((builder.like(root.get(filter.getFieldName()), filter.getFieldValue().toString())));
