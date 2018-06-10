@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.AgiEntity;
 import com.sepnotican.agi.core.annotations.BigString;
 import com.sepnotican.agi.core.annotations.LinkedObject;
+import com.sepnotican.agi.core.annotations.Picture;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.annotations.Synonym;
 import com.sepnotican.agi.core.dao.CompareType;
@@ -19,14 +20,18 @@ import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.server.SerializableFunction;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -54,12 +59,34 @@ public class GenericFieldGenerator {
             component = generateEnumField(field);
         } else if (field.isAnnotationPresent(LinkedObject.class)) {
             component = generateLinkedObjectField(field);
+        } else if (field.getType().equals(byte[].class) && field.isAnnotationPresent(Picture.class)) {
+            component = generatePictureComponent(field);
+            makeUpCaptionForField(field, ((HorizontalLayout) component).getComponent(1));
+            return component;
         } else {
             log.error("getComponentByField(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
         }
         makeUpCaptionForField(field, component);
         return component;
+    }
+
+    protected com.vaadin.ui.Component generatePictureComponent(Field field) {
+
+        Image image = new Image();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Upload.Receiver receiver = (filename, mimeType) -> byteArrayOutputStream;
+        Upload upload = new Upload("Select the image", receiver);
+        upload.addSucceededListener(succeededEvent -> {
+            image.setData(byteArrayOutputStream.toByteArray());
+            image.markAsDirtyRecursive();
+        });
+        if (field.getAnnotation(Picture.class).editable()) {
+            image.addClickListener(click -> {
+                upload.submitUpload();
+            });
+        }
+        return new HorizontalLayout(image, upload);
     }
 
     @SuppressWarnings("unchecked")
@@ -81,6 +108,19 @@ public class GenericFieldGenerator {
                 || field.getType().isEnum()
                 || field.isAnnotationPresent(LinkedObject.class)) {
             binder.bind((HasValue) component, field.getName());
+        } else if (field.getType().equals(byte[].class) && field.isAnnotationPresent(Picture.class)) {
+            Image image = Image.class.cast(HorizontalLayout.class.cast(component).getComponent(0));
+            Upload upload = Upload.class.cast(HorizontalLayout.class.cast(component).getComponent(1));
+            upload.addSucceededListener(new Upload.SucceededListener() {
+                @Override
+                @SneakyThrows
+                public void uploadSucceeded(Upload.SucceededEvent event) {
+                    if (!field.isAccessible()) field.setAccessible(true);
+                    field.set(binder.getBean(), image.getData());
+                    image.markAsDirty();
+                }
+            });
+            //binder.bind((HasValue) component, field.getName());
         } else {
             log.error("getComponentByFieldAndBind(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;

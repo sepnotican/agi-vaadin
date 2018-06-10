@@ -2,6 +2,7 @@ package com.sepnotican.agi.core.form.generic;
 
 import com.google.common.collect.ImmutableSet;
 import com.sepnotican.agi.core.annotations.AgiColumnValueProvider;
+import com.sepnotican.agi.core.annotations.LinkedObject;
 import com.sepnotican.agi.core.annotations.RepresentationResolver;
 import com.sepnotican.agi.core.dao.CompareType;
 import com.sepnotican.agi.core.dao.CriteriaFilter;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,8 @@ public class AbstractListForm<T> extends VerticalLayout {
     @Autowired
     GenericDaoFactory genericDaoFactory;
 
+    List<Class<?>> supportedFilters;
+
     protected IFormHandler formHandler;
     protected Grid<T> grid;
     protected Class<T> aClass;
@@ -70,11 +74,27 @@ public class AbstractListForm<T> extends VerticalLayout {
 
     @PostConstruct
     protected void init() {
+        fillSupportedFilters();
         initializeGridDataProvider();
         createCommandPanel();
         createFilterLayout();
-        createFilers();
+        createFilters();
         createGrid();
+    }
+
+    private void fillSupportedFilters() {
+        supportedFilters = new ArrayList<>();
+        supportedFilters.add(Integer.class);
+        supportedFilters.add(int.class);
+        supportedFilters.add(Long.class);
+        supportedFilters.add(long.class);
+        supportedFilters.add(String.class);
+        supportedFilters.add(Short.class);
+        supportedFilters.add(short.class);
+        supportedFilters.add(Double.class);
+        supportedFilters.add(double.class);
+        supportedFilters.add(Boolean.class);
+        supportedFilters.add(boolean.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -104,8 +124,10 @@ public class AbstractListForm<T> extends VerticalLayout {
     }
 
     @SuppressWarnings("unchecked")
-    protected void createFilers() {
+    protected void createFilters() {
         for (Field field : aClass.getDeclaredFields()) {
+            if (!(supportedFilters.contains(field.getType()) || field.isAnnotationPresent(LinkedObject.class)))
+                continue;
             com.vaadin.ui.Component componentByField = genericFieldGenerator.getComponentByField(field);
             if (componentByField == null) continue;
             ((HasValue) componentByField).addValueChangeListener((HasValue.ValueChangeListener) event -> {
