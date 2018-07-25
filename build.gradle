@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'java-library'
 
 group = 'com.sepnotican'
 version = '0.0.1-SNAPSHOT'
@@ -11,24 +10,4 @@ repositories {
 }
 
 dependencies {
-
-}
-
-
-subprojects {
-	apply plugin: "java"
-
-	tasks.withType(JavaCompile) {
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
-	}
-	dependencies {
-		compile group: 'org.projectlombok', name: 'lombok', version: '1.18.0'
-		// https://mvnrepository.com/artifact/com.google.guava/guava
-		compile group: 'com.google.guava', name: 'guava', version: '25.1-jre'
-	}
-
-	repositories {
-		mavenCentral()
-	}
 }
