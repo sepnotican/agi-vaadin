@@ -8,16 +8,11 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @ComponentScan("agi.core")
-@PropertySource({"classpath:messages.properties", "classpath:agiconfig.properties"})
+@PropertySource({"classpath:messages.properties", "classpath:agiconfig.properties", "classpath:application.properties"})
 public class AgiCoreConfig {
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
-    }
-
-    @Bean
-    public MyListener myListener() {
-        return new MyListener();
     }
 }
