@@ -1,2 +1,2 @@
 rootProject.name = 'agi'
-include ':agi-core-starter'
+include ':agi-core-starter', 'agi-example'
