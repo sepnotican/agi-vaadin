@@ -1,5 +1,6 @@
 package agi.core.form.generic;
 
+import agi.core.components.ImageHasValue;
 import agi.core.annotations.AgiEntity;
 import agi.core.annotations.BigString;
 import agi.core.annotations.LinkedObject;
@@ -21,7 +22,6 @@ import com.vaadin.server.SerializableFunction;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
@@ -73,13 +73,13 @@ public class GenericFieldGenerator {
 
     protected com.vaadin.ui.Component generatePictureComponent(Field field) {
 
-        Image image = new Image();
+        ImageHasValue image = new ImageHasValue();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Upload.Receiver receiver = (filename, mimeType) -> byteArrayOutputStream;
         Upload upload = new Upload("Select the image", receiver);
         upload.addSucceededListener(succeededEvent -> {
-            image.setData(byteArrayOutputStream.toByteArray());
-            image.markAsDirtyRecursive();
+            image.setValue(byteArrayOutputStream.toByteArray());
+//            image.markAsDirtyRecursive();
         });
         if (field.getAnnotation(Picture.class).editable()) {
             image.addClickListener(click -> {
@@ -109,7 +109,7 @@ public class GenericFieldGenerator {
                 || field.isAnnotationPresent(LinkedObject.class)) {
             binder.bind((HasValue) component, field.getName());
         } else if (field.getType().equals(byte[].class) && field.isAnnotationPresent(Picture.class)) {
-            Image image = Image.class.cast(HorizontalLayout.class.cast(component).getComponent(0));
+            ImageHasValue image = ImageHasValue.class.cast(HorizontalLayout.class.cast(component).getComponent(0));
             Upload upload = Upload.class.cast(HorizontalLayout.class.cast(component).getComponent(1));
             upload.addSucceededListener(new Upload.SucceededListener() {
                 @Override
@@ -120,7 +120,7 @@ public class GenericFieldGenerator {
                     image.markAsDirty();
                 }
             });
-            //binder.bind((HasValue) component, field.getName());
+            binder.bind(image, field.getName());
         } else {
             log.error("getComponentByFieldAndBind(): not implemented cast for {}", field.getType().getCanonicalName());
             return null;
