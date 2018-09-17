@@ -62,12 +62,12 @@ public class Customer {
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TradeDeal> tradeDeals;
 
-    @AgiColumnValueProvider
-    @Synonym("Count of trade deals with the client")
-    @AgiDrawOrder(100)
-    public static ValueProvider<Customer, String> countOfDeals() {
-        return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
-    }
+//    @AgiColumnValueProvider
+//    @Synonym("Count of trade deals with the client")
+//    @AgiDrawOrder(100)
+//    public static ValueProvider<Customer, String> countOfDeals() {
+//        return (ValueProvider<Customer, String>) anObject -> String.valueOf(anObject.tradeDeals.size());
+//    }
 
     public String getFullName() {
         return this.name + ':' + this.id;
