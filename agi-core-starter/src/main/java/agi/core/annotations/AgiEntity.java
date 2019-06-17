@@ -21,7 +21,7 @@ public @interface AgiEntity {
 
     VaadinIcons icon() default VaadinIcons.FILE_TABLE;
 
-    String fieldForInputSearch();
+    String nameForInputSearch();
 
     String menuPath() default "";
 }

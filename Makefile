@@ -2,4 +2,4 @@
 .PHONY: up
 up:
 	docker-compose up -d db
-	./gradlew -p agi-example bootRun
+	./gradlew -p agi-example -Dspring.profiles.active=dev bootRun

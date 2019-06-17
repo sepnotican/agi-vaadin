@@ -42,6 +42,10 @@ public class MainMenuGenerator {
     @PostConstruct
     public void init() {
 
+        System.out.println("=================================");
+        System.out.println(packagesToScan.length);
+        System.out.println("=================================");
+
         for (String prefix : packagesToScan) {
 
             Reflections reflections = new Reflections(prefix);

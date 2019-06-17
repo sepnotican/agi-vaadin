@@ -1,11 +1,6 @@
 package agi.core.form.generic;
 
-import agi.core.annotations.AgiEntity;
-import agi.core.annotations.BigString;
-import agi.core.annotations.LinkedObject;
-import agi.core.annotations.Picture;
-import agi.core.annotations.RepresentationResolver;
-import agi.core.annotations.Synonym;
+import agi.core.annotations.*;
 import agi.core.dao.CompareType;
 import agi.core.dao.CriteriaFilter;
 import agi.core.dao.GenericBackendDataProvider;
@@ -18,13 +13,7 @@ import com.vaadin.data.converter.StringToDoubleConverter;
 import com.vaadin.data.converter.StringToFloatConverter;
 import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.server.SerializableFunction;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Upload;
+import com.vaadin.ui.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,7 +167,7 @@ public class GenericFieldGenerator {
             @SneakyThrows
             public Object apply(Object o) {
                 if (o instanceof String) {
-                    String synonymFieldName = fieldType.getAnnotation(AgiEntity.class).fieldForInputSearch();
+                    String synonymFieldName = fieldType.getAnnotation(AgiEntity.class).nameForInputSearch();
                     Class<?> synonymFieldType = fieldType.getDeclaredField(synonymFieldName).getType();
                     CompareType compareType = synonymFieldType == String.class ? CompareType.LIKE : CompareType.EQUALS;
                     return ImmutableSet.of(new CriteriaFilter(fieldType, synonymFieldName, o, compareType));

@@ -8,18 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "trade_deals")
 @AgiEntity(menuCaption = "Trade deals",
-        singleCaption = "Trade deal", fieldForInputSearch = "id",
+        singleCaption = "Trade deal", nameForInputSearch = "id",
         menuPath = "/Trade")
 @Getter
 @Setter

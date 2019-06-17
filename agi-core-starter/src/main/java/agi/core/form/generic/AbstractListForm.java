@@ -1,6 +1,7 @@
 package agi.core.form.generic;
 
 import agi.core.annotations.AgiColumnValueProvider;
+import agi.core.annotations.Filtered;
 import agi.core.annotations.LinkedObject;
 import agi.core.annotations.RepresentationResolver;
 import agi.core.dao.CompareType;
@@ -15,14 +16,7 @@ import com.vaadin.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.QuerySortOrder;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,11 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -124,7 +114,8 @@ public class AbstractListForm<T> extends VerticalLayout {
     @SuppressWarnings("unchecked")
     protected void createFilters() {
         for (Field field : aClass.getDeclaredFields()) {
-            if (!(supportedFilters.contains(field.getType()) || field.isAnnotationPresent(LinkedObject.class)))
+            if (!field.isAnnotationPresent(Filtered.class) ||
+                    !(supportedFilters.contains(field.getType()) || field.isAnnotationPresent(LinkedObject.class)))
                 continue;
             com.vaadin.ui.Component componentByField = genericFieldGenerator.getComponentByField(field);
             if (componentByField == null) continue;

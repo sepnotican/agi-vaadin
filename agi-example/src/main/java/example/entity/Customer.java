@@ -1,34 +1,17 @@
 package example.entity;
 
-import agi.core.annotations.AgiColumnValueProvider;
-import agi.core.annotations.AgiDrawOrder;
-import agi.core.annotations.AgiEntity;
-import agi.core.annotations.BigString;
-import agi.core.annotations.RepresentationResolver;
-import agi.core.annotations.Synonym;
-import com.vaadin.data.ValueProvider;
+import agi.core.annotations.*;
 import example.ClientLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Set;
 
 @Entity
 @Table(name = "customer")
 @AgiEntity(menuCaption = "Our Customers ",
         singleCaption = "Customer",
-        fieldForInputSearch = "name",
+        nameForInputSearch = "name",
         menuPath = "/Trade")
 @RepresentationResolver("getFullName")
 @Getter
@@ -42,11 +25,13 @@ public class Customer {
     @GeneratedValue
     @Synonym("Identifier")
     @AgiDrawOrder(value = -1)
+    @Filtered
     private Long id;
 
     @Column
     @Synonym("Customer caption")
     @AgiDrawOrder(value = 2)
+    @Filtered
     private String name;
 
     @Column
@@ -57,6 +42,7 @@ public class Customer {
     @Column
     @Synonym("Client grade level")
     @AgiDrawOrder(value = 5)
+    @Filtered
     private ClientLevel color;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
